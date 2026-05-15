@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 
 namespace JobPortalAPI.Controllers
 {
+    [ApiController]
+    [Route("api/auth")]
     public class AuthController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+
+        //private readonly IAuthService _service;
     }
 }

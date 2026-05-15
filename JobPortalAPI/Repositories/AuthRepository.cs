@@ -1,6 +1,6 @@
 ﻿namespace JobPortalAPI.DataAccess
 {
-    public class AuthDataProvider
+    public class AuthRepository
     {
     }
 }
