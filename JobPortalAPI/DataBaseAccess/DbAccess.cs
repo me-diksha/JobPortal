@@ -1,5 +1,6 @@
 ﻿using JobPortalAPI.DataBaseAccess.Abstractions;
 using JobPortalAPI.Settings;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Data;
@@ -18,7 +19,7 @@ namespace JobPortalAPI.DataBaseAccess
             {
                 Host = db.Host,
                 Port = db.Port ?? 5432,
-                Database = db.DatabaseName,
+                Database = db.Database,
                 Username = db.Username,
                 Password = db.Password,
                 Pooling = true,
@@ -32,5 +33,9 @@ namespace JobPortalAPI.DataBaseAccess
             connection.Open();
             return connection;
         }
+
+
+   
+
     }
 }

@@ -1,9 +1,11 @@
-﻿using System.Data;
+﻿using Npgsql;
+using System.Data;
 
 namespace JobPortalAPI.DataBaseAccess.Abstractions
 {
     public interface IDbAccess
     {
         IDbConnection CreateConnection();
+       
     }
 }

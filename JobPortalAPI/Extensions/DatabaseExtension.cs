@@ -1,6 +1,8 @@
 ﻿using JobPortalAPI.Settings;
 using JobPortalAPI.DataBaseAccess.Abstractions;
 using JobPortalAPI.DataBaseAccess;
+using JobPortalAPI.Repositories.Abstractions;
+using JobPortalAPI.DataAccess;
 
 namespace JobPortalAPI.Extensions
 {
@@ -10,6 +12,7 @@ namespace JobPortalAPI.Extensions
 
             services.Configure<DBSettings>(configuration.GetSection("Database"));
             services.AddScoped<IDbAccess, DbAccess>();
+            services.AddScoped<IAuthRepository,AuthRepository>();
             return services;
         }
     }

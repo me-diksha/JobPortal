@@ -16,6 +16,7 @@ namespace JobPortalAPI.Extensions
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

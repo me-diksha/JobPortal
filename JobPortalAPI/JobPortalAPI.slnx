@@ -1,10 +1,3 @@
 <Solution>
-  <Folder Name="/SLib/">
-    <Project Path="../../../SLib/SLib.Global.Standard/SLib.Global.Standard.csproj" />
-    <Project Path="../../../SLib/SLib.Logger.Standard.Log4Net.Extention/SLib.Logger.Standard.Log4Net.Extention.csproj" />
-    <Project Path="../../../SLib/SLib.Logger.Standard/SLib.Logger.Standard.csproj" />
-    <Project Path="../../../SLib/TDData/SLib.TDData.PostgreSQL.Standard/SLib.TDData.PostgreSQL.Standard.csproj" />
-    <Project Path="../../../SLib/TDData/SLib.TDData.Standard/SLib.TDData.Standard.csproj" />
-  </Folder>
   <Project Path="JobPortalAPI.csproj" />
 </Solution>
