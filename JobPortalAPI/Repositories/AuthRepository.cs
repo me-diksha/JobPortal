@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using JobPortalAPI.Common;
 using JobPortalAPI.DataBaseAccess.Abstractions;
-using JobPortalAPI.Models.Common;
 using JobPortalAPI.Models.Responses;
 using JobPortalAPI.Repositories.Abstractions;
 using JobPortalAPI.Services.Abstractions;

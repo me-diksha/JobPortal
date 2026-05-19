@@ -1,4 +1,4 @@
-﻿using JobPortalAPI.Models.Common;
+﻿using JobPortalAPI.Common;
 
 namespace JobPortalAPI.Repositories.Abstractions
 {
