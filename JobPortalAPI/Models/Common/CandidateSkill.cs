@@ -1,4 +1,4 @@
-﻿namespace JobPortalAPI.Common
+﻿namespace JobPortalAPI.Models.Common
 {
     public class CandidateSkill
     {

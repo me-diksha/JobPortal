@@ -1,7 +1,9 @@
-﻿namespace JobPortalAPI.Models.Responses
+﻿namespace JobPortalAPI.Models.Common
 {
-    public class CandidateProfileResponse
+    public class CandidateProfile
     {
+        public int Id { get; set; }
+
         public int UserId { get; set; }
 
         public string? Headline { get; set; }
