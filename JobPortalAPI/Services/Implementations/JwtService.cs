@@ -33,6 +33,7 @@ namespace JobPortalAPI.Services.Implementations
                 var claims = new List<Claim>
                 {
                      new Claim(JwtRegisteredClaimNames.Sub, Id.ToString()),
+                     new Claim(ClaimTypes.NameIdentifier, Id.ToString()),
                      new Claim(JwtRegisteredClaimNames.Email, Email ?? ""),
                      new Claim(JwtRegisteredClaimNames.UniqueName,Login ?? string.Empty),
                      new Claim("actor_type", actorType),

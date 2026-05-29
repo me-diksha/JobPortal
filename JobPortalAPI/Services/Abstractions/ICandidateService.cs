@@ -6,13 +6,13 @@ namespace JobPortalAPI.Services.Abstractions
 {
     public interface ICandidateService
     {
-        Task<int> CreateProfile(CreateCandidateProfileRequest request);
+        Task<int> CreateProfile( int userid,CreateCandidateProfileRequest request);
 
-        Task<int> AddSkill(CandidateSkillRequest request);
+        Task<int> AddSkill(int userid,CandidateSkillRequest request);
 
-        Task<int> AddEducation(CandidateEducationRequest request);
+        Task<int> AddEducation(int userid,CandidateEducationRequest request);
 
-        Task<int> AddExperience(CandidateExperienceRequest request);
+        Task<int> AddExperience(int userid,CandidateExperienceRequest request);
         Task<CandidateProfile?> GetProfile(int userId);
 
         Task<List<CandidateSkillResponse>> GetSkills(int userId);

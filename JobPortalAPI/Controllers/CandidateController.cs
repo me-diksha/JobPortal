@@ -1,131 +1,186 @@
-﻿using JobPortalAPI.Models.Requests;
+﻿using JobPortalAPI.Common;
+using JobPortalAPI.Models.Requests;
 using JobPortalAPI.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 namespace JobPortalAPI.Controllers
 {
+    [Authorize(Policy = PolicyNames.CandidateOnly)]
+    [ApiController]
+    [Route("api/candidate")]
     public class CandidateController : ControllerBase
     {
         private readonly ICandidateService _candidateService;
+        private int UserId
+        {
+            get
+            {
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+                if (string.IsNullOrEmpty(claim))
+                    throw new UnauthorizedAccessException();
+
+                return int.Parse(claim);
+            }
+        }
         public CandidateController(ICandidateService candidateService)
         {
             _candidateService = candidateService;
         }
-        [HttpPost("profile")]
+
+        #region[profile]
+
+        [HttpPost("createprofile")]
         public async Task<IActionResult> CreateProfile(
         CreateCandidateProfileRequest request)
         {
-            var result = await _candidateService.CreateProfile(request);
+            
+
+            var result = await _candidateService.CreateProfile(
+                UserId,
+                request);
 
             return Ok(result);
         }
 
-        [HttpGet("profile/{userId}")]
-        public async Task<IActionResult> GetProfile(int userId)
+        [HttpGet("getprofile")]
+        public async Task<IActionResult> GetProfile()
         {
-            var result = await _candidateService.GetProfile(userId);
-
+            var result = await _candidateService.GetProfile(UserId);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
-        [HttpPost("skills")]
+        [HttpPost("profile")]
+        public async Task<IActionResult> GetFullProfile()
+        {
+
+            var response = await _candidateService.GetFullProfile(UserId);
+            if (response == null)
+                return NotFound();
+            return Ok(response);
+        }
+
+        #endregion
+
+        #region[skills]
+        [HttpPost("addskills")]
         public async Task<IActionResult> AddSkill(
        CandidateSkillRequest request)
         {
-            var result = await _candidateService.AddSkill(request);
+            var result = await _candidateService.AddSkill(UserId,request);
 
             return Ok(result);
         }
 
-        [HttpGet("skills/{userId}")]
-        public async Task<IActionResult> GetSkills(int userId)
+        [HttpGet("getskills")]
+        public async Task<IActionResult> GetSkills()
         {
-            var result = await _candidateService.GetSkills(userId);
+            var result = await _candidateService.GetSkills(UserId);
 
             return Ok(result);
         }
 
         [HttpDelete("skills/{id}")]
-        public async Task<IActionResult> DeleteSkill(int id)
+        public async Task<IActionResult> DeleteSkill([FromRoute] int id)
         {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized();
-            int userId = int.Parse(userIdClaim);
-            await _candidateService.DeleteSkill(id,userId);
+            var deleted=await _candidateService.DeleteSkill(id,UserId);
+            if (!deleted)
+            {
+                return NotFound(new
+                {
+                    Message = "Skill not found"
+                });
+            }
 
-            return Ok();
+            return Ok(new
+            {
+                Message = "Skill deleted successfully"
+            });
         }
-        [HttpPost("education")]
+
+        #endregion
+
+        #region[education]
+        [HttpPost("addeducation")]
         public async Task<IActionResult> AddEducation(
         CandidateEducationRequest request)
         {
-            var result = await _candidateService.AddEducation(request);
+            var result = await _candidateService.AddEducation(UserId,request);
 
             return Ok(result);
         }
 
-        [HttpGet("education/{userId}")]
-        public async Task<IActionResult> GetEducation(int userId)
+        [HttpGet("geteducation")]
+        public async Task<IActionResult> GetEducation()
         {
-            var result = await _candidateService.GetEducation(userId);
+            var result = await _candidateService.GetEducation(UserId);
 
             return Ok(result);
         }
 
         [HttpDelete("education/{id}")]
-        public async Task<IActionResult> DeleteEducation(int id)
+        public async Task<IActionResult> DeleteEducation([FromRoute] int id)
         {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized();
-            int userId = int.Parse(userIdClaim);
-            await _candidateService.DeleteEducation(id,userId);
+           
+            var deleted =await _candidateService.DeleteEducation(id,UserId);
+            if (!deleted)
+            {
+                return NotFound(new
+                {
+                    Message = "Education not found"
+                });
+            }
 
-            return Ok();
+            return Ok(new
+            {
+                Message = "Education deleted successfully"
+            });
         }
 
-        [HttpPost("experience")]
-        public async Task<IActionResult> AddExperience(
+        #endregion
+
+        #region[experience]
+        [HttpPost("addexperience")]
+        public async Task<IActionResult> AddExperience( 
         CandidateExperienceRequest request)
         {
-            var result = await _candidateService.AddExperience(request);
+            var result = await _candidateService.AddExperience(UserId,request);
 
             return Ok(result);
         }
-        [HttpGet("experience/{userId}")]
-        public async Task<IActionResult> GetExperience(int userId)
+        [HttpGet("getexperience")]
+        public async Task<IActionResult> GetExperience()
         {
-            var result = await _candidateService.GetExperience(userId);
+            var result = await _candidateService.GetExperience(UserId);
 
             return Ok(result);
         }
 
         [HttpDelete("experience/{id}")]
-        public async Task<IActionResult> DeleteExperience(int id)
+        public async Task<IActionResult> DeleteExperience([FromRoute] int id)
         {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized();
-            int userId = int.Parse(userIdClaim);
-            await _candidateService.DeleteExperience(id,userId);
 
-            return Ok();
+            var deleted= await _candidateService.DeleteExperience(id,UserId);
+            if (!deleted)
+            {
+                return NotFound(new
+                {
+                    Message = "REQUIRED EXPERIENCE  NOT FOUND"
+                });
+            }
+
+            return Ok(new
+            {
+                Message = "Experience deleted successfully"
+            });
         }
 
-        [HttpPost("/api/candidate/profile")]
-        public async Task<IActionResult> GetFullProfile()
-        {
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized();
-            int userId = int.Parse(userIdClaim);
-            var response = await _candidateService.GetFullProfile(userId);
-            if (response == null)
-                return NotFound();
-            return Ok(response);
-        }
+        #endregion
+        
     }
 }

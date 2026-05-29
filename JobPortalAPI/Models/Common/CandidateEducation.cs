@@ -17,5 +17,7 @@
         public int EndYear { get; set; }
 
         public decimal Percentage { get; set; }
+
+       
     }
 }

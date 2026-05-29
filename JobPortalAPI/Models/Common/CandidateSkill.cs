@@ -8,6 +8,7 @@
 
         public int SkillId { get; set; }
 
+        public string SkillName { get; set; } = string.Empty;
         public int ExperienceYears { get; set; }
     }
 }

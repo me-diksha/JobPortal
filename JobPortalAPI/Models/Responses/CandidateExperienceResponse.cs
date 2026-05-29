@@ -1,6 +1,6 @@
 ﻿namespace JobPortalAPI.Models.Responses
 {
-    public class CandidateexperienceResponse
+    public class CandidateExperienceResponse
     {
         public int Id { get; set; }
 
@@ -8,9 +8,9 @@
 
         public string Designation { get; set; } = string.Empty;
 
-        public DateTime StartDate { get; set; }
+        public DateOnly StartDate { get; set; }
 
-        public DateTime? EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
 
         public bool CurrentlyWorking { get; set; }
 

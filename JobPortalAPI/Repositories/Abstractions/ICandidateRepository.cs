@@ -6,16 +6,16 @@ namespace JobPortalAPI.Repositories.Abstractions
 {
     public interface ICandidateRepository
     {
-        Task<int> CreateProfile(CreateCandidateProfileRequest request);
+        Task<int> CreateProfile(CandidateProfile request);
 
-        Task<int> AddSkill(CandidateSkillRequest request);
+        Task<int> AddSkill(CandidateSkill skill);
 
-        Task<int> AddEducation(CandidateEducationRequest request);
+        Task<int> AddEducation(CandidateEducation education);
 
-        Task<int> AddExperience(CandidateExperienceRequest request);
+        Task<int> AddExperience(CandidateExperience experience);
 
         Task<CandidateProfile?> GetProfile(int userId);
-        Task<List<CandidateSkillResponse>> GetSkills(int userId);
+        Task<List<CandidateSkill>> GetSkills(int userId);
         Task<List<CandidateEducation>> GetEducation(int userId);
         Task<List<CandidateExperience>> GetExperience(int userId);
         Task<bool> DeleteSkill(int skillRecordId, int userId);

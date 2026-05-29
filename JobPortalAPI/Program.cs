@@ -1,3 +1,4 @@
+using Dapper;
 using JobPortalAPI.Extensions;
 using JobPortalAPI.Settings;
 var builder = WebApplication.CreateBuilder(args);
@@ -6,11 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddDatabaseServices(builder.Configuration); //for database connection
-builder.Services.AddAutoMapper(typeof(Program));  //for dto mapping
+builder.Services.AddAutoMapper(typeof(MappingProfile));  //for dto mapping
+
 builder.Services.AddAuthServices(builder.Configuration); //for jwt authentication
-builder.Services.AddAuthorization(); //for know it is not properly wrote
+builder.Services.AddServices(builder.Configuration);
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddSwaggerServices();
+SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 
 var app = builder.Build();
@@ -18,6 +22,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    
     app.UseSwaggerUI();
 }
 

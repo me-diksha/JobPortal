@@ -1,10 +1,8 @@
-﻿namespace JobPortalAPI.Models.Common
+﻿namespace JobPortalAPI.Models.Responses
 {
-    public class CandidateProfile
+    public class CandidateProfileResponse
     {
         public int Id { get; set; }
-
-        public int UserId { get; set; }
 
         public string? Headline { get; set; }
 
@@ -25,7 +23,6 @@
         public decimal ExpectedSalary { get; set; }
 
         public string? ResumeUrl { get; set; }
-
         public string Firstname { get; set; }
         public string? LastName { get; set; }
     }

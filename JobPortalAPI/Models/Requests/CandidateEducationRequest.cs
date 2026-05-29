@@ -2,7 +2,6 @@
 {
     public class CandidateEducationRequest
     {
-        public int UserId { get; set; }
 
         public string InstituteName { get; set; } = string.Empty;
 

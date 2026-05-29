@@ -1,0 +1,142 @@
+--script for skill table INSERT INTO public.skills (name) VALUES
+-- Programming Languages
+('C'),
+('C++'),
+('C#'),
+('Java'),
+('Python'),
+('JavaScript'),
+('TypeScript'),
+('Go'),
+('Ruby'),
+('PHP'),
+('Kotlin'),
+('Swift'),
+('Rust'),
+('Scala'),
+
+-- Web Development (Frontend)
+('HTML'),
+('CSS'),
+('SASS'),
+('LESS'),
+('Tailwind CSS'),
+('Bootstrap'),
+('React'),
+('Angular'),
+('Vue.js'),
+('Next.js'),
+('Nuxt.js'),
+
+-- Web Development (Backend)
+('Node.js'),
+('Express.js'),
+('Django'),
+('Flask'),
+('Spring Boot'),
+('Laravel'),
+('ASP.NET'),
+('FastAPI'),
+
+-- Databases
+('MySQL'),
+('PostgreSQL'),
+('MongoDB'),
+('SQLite'),
+('Redis'),
+('Oracle Database'),
+('Elasticsearch'),
+
+-- DevOps / Cloud
+('Git'),
+('GitHub'),
+('GitLab'),
+('Docker'),
+('Kubernetes'),
+('CI/CD'),
+('AWS'),
+('Azure'),
+('Google Cloud Platform'),
+('Linux'),
+('Shell Scripting'),
+('Terraform'),
+('Jenkins'),
+
+-- Mobile Development
+('Android Development'),
+('iOS Development'),
+('Flutter'),
+('React Native'),
+
+-- Data & AI
+('Data Analysis'),
+('Data Science'),
+('Machine Learning'),
+('Deep Learning'),
+('Artificial Intelligence'),
+('Natural Language Processing'),
+('TensorFlow'),
+('PyTorch'),
+('Pandas'),
+('NumPy'),
+('Power BI'),
+('Tableau'),
+
+-- Software Engineering Concepts
+('Data Structures'),
+('Algorithms'),
+('Object Oriented Programming'),
+('System Design'),
+('Design Patterns'),
+('REST APIs'),
+('GraphQL'),
+
+-- Testing / QA
+('Unit Testing'),
+('Integration Testing'),
+('Selenium'),
+('Manual Testing'),
+('Automation Testing'),
+('Postman'),
+
+-- Cybersecurity
+('Cybersecurity'),
+('Ethical Hacking'),
+('Network Security'),
+('Penetration Testing'),
+
+-- UI/UX & Design
+('UI Design'),
+('UX Design'),
+('Figma'),
+('Adobe XD'),
+('Photoshop'),
+('Illustrator'),
+
+-- Product / Business Skills
+('Product Management'),
+('Business Analysis'),
+('Digital Marketing'),
+('SEO'),
+('Content Writing'),
+('Copywriting'),
+('Sales'),
+('Market Research'),
+
+-- Soft Skills (Non-Technical)
+('Communication'),
+('Teamwork'),
+('Leadership'),
+('Problem Solving'),
+('Critical Thinking'),
+('Time Management'),
+('Adaptability'),
+('Collaboration'),
+('Decision Making'),
+('Creativity'),
+('Work Ethic'),
+('Conflict Resolution'),
+('Emotional Intelligence'),
+('Negotiation'),
+('Public Speaking'),
+('Presentation Skills');
