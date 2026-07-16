@@ -24,6 +24,7 @@ namespace JobPortalAPI.Services.Implementations
             _mapper = mappingProfile;
             _logger = logger;
         }
+        #region[Profile]
         public async Task<int> CreateProfile(int userid,CreateCandidateProfileRequest request)
         {
             var profile = new CandidateProfile
@@ -45,7 +46,47 @@ namespace JobPortalAPI.Services.Implementations
 
             return await _repository.CreateProfile(profile);
         }
+        public async Task<CandidateProfile?> GetProfile(int userid)
+        {
+            try
+            {
+                return await _repository.GetProfile(userid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetProfile");
+                throw;
+            }
+        }
+        public async Task<CandidateFullProfileResponse?> GetFullProfile(int userId)
+        {
+            var profile =
+                await _repository.GetProfile(userId);
+            if (profile == null)
+                return null;
+            var skills =
+                await _repository.GetSkills(userId);
 
+            var education =
+                await _repository.GetEducation(userId);
+
+            var experience =
+                await _repository.GetExperience(userId);
+
+            return new CandidateFullProfileResponse
+            {
+                Profile = _mapper.Map<CandidateProfileResponse>(profile),
+
+                Skills = _mapper.Map<List<CandidateSkillResponse>>(skills),
+
+                Education = _mapper.Map<List<CandidateEducationResponse>>(education),
+
+                Experience = _mapper.Map<List<CandidateExperienceResponse>>(experience)
+            };
+        }
+        #endregion
+
+        #region[Skill]
         public async Task<int> AddSkill(int userid,CandidateSkillRequest request)
         {
             try
@@ -68,7 +109,52 @@ namespace JobPortalAPI.Services.Implementations
             }
 
         }
+        public async Task<List<CandidateSkillResponse>> GetSkills(int userid)
+        {
+            try
+            {
+                var skills = await _repository.GetSkills(userid);
+                return _mapper.Map<List<CandidateSkillResponse>>(skills);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetSkills");
+                throw;
+            }
+        }
+        public async Task<bool> DeleteSkill(int skillRecordId, int userId)
+        {
+            try
+            {
+                var result = await _repository.DeleteSkill(skillRecordId, userId);
+                if (!result)
+                    throw new KeyNotFoundException("Skill record not found.");
 
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting skill");
+                throw;
+            }
+
+        }
+        #endregion
+
+        #region[Education]
+        public async Task<List<CandidateEducationResponse>> GetEducation(int userId)
+        {
+            try
+            {
+                var education = await _repository.GetEducation(userId);
+                return _mapper.Map<List<CandidateEducationResponse>>(education);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetEducation");
+                throw;
+            }
+        }
         public async Task<int> AddEducation(int userid,CandidateEducationRequest request)
         {
             try
@@ -99,7 +185,57 @@ namespace JobPortalAPI.Services.Implementations
                 throw ;
             }
         }
+        public async Task<CandidateEducationResponse> UpdateEducation(int userId, CandidateEducationRequest request, int educationId)
+        {
+            try
+            {
+                if (request.StartYear > request.EndYear)
+                    throw new ArgumentException("Start year cannot be greater than end year.");
+                var addeducation = new CandidateEducation
+                {
+                    UserId = userId,
+                    EndYear = request.EndYear,
+                    StartYear = request.StartYear,
+                    InstituteName = request.InstituteName,
+                    FieldOfStudy = request.FieldOfStudy,
+                    Degree = request.Degree,
+                    Percentage = request.Percentage
+                };
+                var updatededucation = await _repository.UpdateEducation(addeducation, educationId);
+                return _mapper.Map<CandidateEducationResponse>(updatededucation);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Validation error in AddEducation");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Service error in AddEducation");
+                throw;
+            }
+        }
+        public async Task<bool> DeleteEducation(int educationId, int userId)
+        {
+            try
+            {
+                var result = await _repository.DeleteEducation(educationId, userId);
 
+                if (!result)
+                    throw new KeyNotFoundException("Education record not found.");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting education");
+                throw;
+            }
+
+        }
+        #endregion
+
+        #region[Experience]
         public async Task<int> AddExperience(int userid,CandidateExperienceRequest request)
         {
             try
@@ -129,46 +265,7 @@ namespace JobPortalAPI.Services.Implementations
                 throw;
             }
         }
-        public async Task<CandidateProfile?> GetProfile(int userid)
-        {
-            try
-            {
-                return await _repository.GetProfile(userid);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetProfile");
-                throw;
-            }
-        }
-
-        public async Task<List<CandidateSkillResponse>> GetSkills(int userid)
-        {
-            try
-            {
-                var skills = await _repository.GetSkills(userid);
-                return _mapper.Map<List<CandidateSkillResponse>>(skills);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetSkills");
-                throw;
-            }
-        }
-
-        public async Task<List<CandidateEducationResponse>> GetEducation(int userId)
-        {
-            try
-            {
-                var education = await _repository.GetEducation(userId);
-                return _mapper.Map<List<CandidateEducationResponse>>(education);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in GetEducation");
-                throw;
-            }
-        }
+        
 
         public async Task<List<CandidateExperienceResponse>> GetExperience(int userId)
         {
@@ -184,41 +281,40 @@ namespace JobPortalAPI.Services.Implementations
             }
         }
 
-        public async Task<bool> DeleteSkill(int skillRecordId,int userId)
+        public async Task<CandidateExperienceResponse> UpdateExperience(int userid, CandidateExperienceRequest request,int id)
         {
             try
             {
-                var result = await _repository.DeleteSkill(skillRecordId, userId);
-                if (!result)
-                    throw new KeyNotFoundException("Skill record not found.");
-
-                return result;
+                if (!request.CurrentlyWorking &&
+             request.EndDate.HasValue &&
+             request.StartDate > request.EndDate.Value)
+                {
+                    throw new ArgumentException("Start date cannot be greater than end date.");
+                }
+                var updateexperience = new CandidateExperience
+                {
+                    Id=id,
+                    UserId = userid,
+                    CompanyName = request.CompanyName,
+                    Designation = request.Designation,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    CurrentlyWorking = request.CurrentlyWorking,
+                    Description = request.Description
+                };
+                var updatedexperience = await _repository.UpdateExperience(updateexperience);
+                return _mapper.Map<CandidateExperienceResponse>(updatedexperience);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Validation error in UpdateExperience");
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting skill");
+                _logger.LogError(ex, "Service error in UpdateExperience");
                 throw;
             }
- 
-        }
-
-        public async Task<bool> DeleteEducation(int educationId,int userId)
-        {
-            try
-            {
-                var result = await _repository.DeleteEducation(educationId, userId);
-
-                if (!result)
-                    throw new KeyNotFoundException("Education record not found.");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting education");
-                throw;
-            }
-            
         }
         public async Task<bool> DeleteExperience(int experienceId,int userId)
         {
@@ -238,32 +334,7 @@ namespace JobPortalAPI.Services.Implementations
             }
 
         }
+        #endregion
 
-        public async Task<CandidateFullProfileResponse?> GetFullProfile(int userId)
-        {
-         var profile =
-            await _repository.GetProfile(userId);
-        if (profile == null)
-            return null;
-            var skills =
-            await _repository.GetSkills(userId);
-
-        var education =
-            await _repository.GetEducation(userId);
-
-        var experience =
-            await _repository.GetExperience(userId);
-
-        return new CandidateFullProfileResponse
-        {
-            Profile = _mapper.Map<CandidateProfileResponse>(profile),
-
-            Skills = _mapper.Map<List<CandidateSkillResponse>>(skills),
-
-            Education = _mapper.Map<List<CandidateEducationResponse>>(education),
-
-            Experience = _mapper.Map<List<CandidateExperienceResponse>>(experience)
-        };
-    }
     }
 }

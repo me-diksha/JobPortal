@@ -22,6 +22,9 @@ namespace JobPortalAPI.Repositories.Abstractions
 
         Task<bool> DeleteEducation(int educationId, int userId);
         Task<bool> DeleteExperience(int experienceId, int userId);
+        Task<CandidateEducation> UpdateEducation(CandidateEducation education, int educationid);
+        Task<CandidateExperience> UpdateExperience(CandidateExperience experience);
+
 
     }
 }

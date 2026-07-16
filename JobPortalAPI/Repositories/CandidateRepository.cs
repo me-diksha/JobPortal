@@ -126,6 +126,33 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
+        public async Task<bool> DeleteSkill(int skillRecordId, int userId)
+        {
+            try
+            {
+                const string sql = @"
+            DELETE FROM candidate_skills
+            WHERE id = @SkillRecordId
+            AND userid = @UserId;";
+
+                using var connection = _dbAccess.CreateConnection();
+
+                var affectedRows = await connection.ExecuteAsync(
+                    sql,
+                    new
+                    {
+                        SkillRecordId = skillRecordId,
+                        UserId = userId
+                    });
+
+                return affectedRows > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in DeleteSkill");
+                throw;
+            }
+        }
 
         #endregion
 
@@ -152,7 +179,43 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
+        public async Task<CandidateEducation> UpdateEducation(CandidateEducation education, int educationid)
+        {
+            try
+            {
+                const string sql = @"
+                SELECT * FROM updateeducation(
+                    @UserId,
+                    @InstituteName,
+                    @Degree,
+                    @FieldOfStudy,
+                    @StartYear,
+                    @EndYear,
+                    @Percentage,
+                    @EducationId
+            );";
+                using var connection = _dbAccess.CreateConnection();
 
+                return await connection.QuerySingleAsync<CandidateEducation>(
+                    sql,
+                    new
+                    {
+                        UserId = education.UserId,
+                        InstituteName = education.InstituteName,
+                        FieldOfStudy = education.FieldOfStudy,
+                        StartYear = education.StartYear,
+                        EndYear = education.EndYear,
+                        Degree = education.Degree,
+                        Percentage = education.Percentage,
+                        EducationId=educationid
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in updating educcation");
+                throw;
+            }
+        }
         public async Task<int> AddEducation(CandidateEducation education)
         {
             try
@@ -192,8 +255,36 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
+        public async Task<bool> DeleteEducation(int educationId, int userId)
+        {
+            try
+            {
+                const string sql = @"
+            DELETE FROM candidate_education
+            WHERE id = @EducationId
+            AND userid = @UserId;";
 
+                using var connection = _dbAccess.CreateConnection();
+
+                var affectedRows = await connection.ExecuteAsync(
+                    sql,
+                    new
+                    {
+                        EducationId = educationId,
+                        UserId = userId
+                    });
+
+                return affectedRows > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in DeleteEducation");
+                throw;
+            }
+        }
         #endregion
+
+        #region[Experience]
         public async Task<List<CandidateExperience>> GetExperience(int userId)
         {
             try
@@ -258,62 +349,48 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
-
-        public async Task<bool> DeleteSkill(int skillRecordId, int userId)
+       public async Task<CandidateExperience> UpdateExperience(CandidateExperience experience)
         {
             try
             {
                 const string sql = @"
-            DELETE FROM candidate_skills
-            WHERE id = @SkillRecordId
-            AND userid = @UserId;";
+        SELECT *
+        FROM update_candidate_experience
+        (
+            @Id,
+            @UserId,
+            @CompanyName,
+            @Designation,
+            @StartDate,
+            @EndDate,
+            @CurrentlyWorking,
+            @Description
+        );";
 
                 using var connection = _dbAccess.CreateConnection();
 
-                var affectedRows = await connection.ExecuteAsync(
+                return await connection.QuerySingleAsync<CandidateExperience>(
                     sql,
                     new
                     {
-                        SkillRecordId = skillRecordId,
-                        UserId = userId
+                        Id = experience.Id,
+                        UserId = experience.UserId,
+                        CompanyName = experience.CompanyName,
+                        Designation = experience.Designation,
+                        StartDate = experience.StartDate,
+                        EndDate = experience.EndDate,
+                        CurrentlyWorking = experience.CurrentlyWorking,
+                        Description = experience.Description
                     });
-
-                return affectedRows > 0;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in DeleteSkill");
+                _logger.LogError(ex, "Error updating experience");
                 throw;
             }
         }
 
-        public async Task<bool> DeleteEducation(int educationId, int userId)
-        {
-            try
-            {
-                const string sql = @"
-            DELETE FROM candidate_education
-            WHERE id = @EducationId
-            AND userid = @UserId;";
 
-                using var connection = _dbAccess.CreateConnection();
-
-                var affectedRows = await connection.ExecuteAsync(
-                    sql,
-                    new
-                    {
-                        EducationId = educationId,
-                        UserId = userId
-                    });
-
-                return affectedRows > 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteEducation");
-                throw;
-            }
-        }
         public async Task<bool> DeleteExperience(int experienceId, int userId)
         {
             try
@@ -341,5 +418,6 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
+        #endregion
     }
 }

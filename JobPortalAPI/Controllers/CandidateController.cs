@@ -123,6 +123,15 @@ namespace JobPortalAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPut("updateeducation")]
+
+        public async Task<IActionResult> UpdateEducation(CandidateEducationRequest request,int id)
+        {
+            var result = await _candidateService.UpdateEducation(UserId, request,id);
+
+            return Ok(result);
+        }
+
         [HttpDelete("education/{id}")]
         public async Task<IActionResult> DeleteEducation([FromRoute] int id)
         {
@@ -179,8 +188,15 @@ namespace JobPortalAPI.Controllers
                 Message = "Experience deleted successfully"
             });
         }
+        [HttpPut("updateexperience")]
 
+        public async Task<IActionResult> UpdateExperience(CandidateExperienceRequest request,int id)
+        {
+            var result = await _candidateService.UpdateExperience(UserId, request,id);
+
+            return Ok(result);
+        }
         #endregion
-        
+
     }
 }

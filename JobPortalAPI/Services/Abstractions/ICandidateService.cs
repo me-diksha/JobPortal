@@ -12,6 +12,8 @@ namespace JobPortalAPI.Services.Abstractions
 
         Task<int> AddEducation(int userid,CandidateEducationRequest request);
 
+        Task<CandidateEducationResponse> UpdateEducation(int userid, CandidateEducationRequest request,int id);
+        Task<CandidateExperienceResponse> UpdateExperience(int userid, CandidateExperienceRequest request,int id);
         Task<int> AddExperience(int userid,CandidateExperienceRequest request);
         Task<CandidateProfile?> GetProfile(int userId);
 
