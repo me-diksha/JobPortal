@@ -84,6 +84,10 @@ namespace JobPortalAPI.Services.Implementations
                 Experience = _mapper.Map<List<CandidateExperienceResponse>>(experience)
             };
         }
+        public async Task<bool> DeleteProfile(long userId)
+        {
+            return await _repository.DeleteCandidateProfile(userId);
+        }
         #endregion
 
         #region[Skill]

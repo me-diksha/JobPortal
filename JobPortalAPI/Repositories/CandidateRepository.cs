@@ -72,7 +72,19 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
+        public async Task<bool> DeleteCandidateProfile(long userId)
+        {
+            using var connection = _dbAccess.CreateConnection();
 
+            var result = await connection.ExecuteScalarAsync<bool>(
+                "SELECT delete_candidate_profile(@p_userid)",
+                new
+                {
+                    p_userid = userId
+                });
+
+            return result;
+        }
         #endregion
 
         #region[skill]

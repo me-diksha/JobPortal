@@ -8,7 +8,8 @@ BEGIN
     RETURN QUERY
     SELECT *
     FROM candidate_profiles
-    WHERE userid = p_userid;
+    WHERE userid = p_userid
+	AND isdeleted = 0;
 END;
 $function$
 ;

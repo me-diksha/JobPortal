@@ -7,7 +7,7 @@ namespace JobPortalAPI.Extensions
     public class MappingProfile:Profile
     {
         public MappingProfile() {
-
+            #region[Candidate]
             // Request -> Entity
             CreateMap<CandidateSkillRequest, CandidateSkill>();
 
@@ -25,6 +25,12 @@ namespace JobPortalAPI.Extensions
             CreateMap<CandidateExperience, CandidateExperienceResponse>();
 
             CreateMap<CandidateProfile, CandidateProfileResponse>();
+            #endregion
+
+            #region[Recruiter]
+            CreateMap<RecruiterProfileRequest, Recruiter>();
+            CreateMap<Recruiter,RecruiterProfileResponse>();
+            #endregion
         }
     }
 }

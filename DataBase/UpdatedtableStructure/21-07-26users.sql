@@ -1,0 +1,8 @@
+ALTER TABLE users
+ADD COLUMN isactive SMALLINT NOT NULL DEFAULT 1;
+
+ALTER TABLE users
+ADD CONSTRAINT chk_users_active
+CHECK (isactive IN (0,1));
+ALTER TABLE users
+ADD COLUMN updateddate TIMESTAMP;
