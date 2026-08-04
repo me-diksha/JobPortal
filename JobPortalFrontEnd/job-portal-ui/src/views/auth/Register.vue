@@ -1,8 +1,11 @@
 <script setup lang="ts">
 
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-
+import { useRouter } from "vue-router"
+import { useToast } from "vue-toastification"
+import {register} from "@/services/authService"
+import { getActorType } from "@/utils/auth.ts";
+const toast = useToast();
 const router = useRouter();
 
 const role = ref("candidate");
@@ -10,22 +13,62 @@ const role = ref("candidate");
 
 const form = ref({
 
-    Name: "",
+    FirstName: "",
+    LastName: "",
     email: "",
     password: "",
     confirmPassword: "",
     companyName: "",
-    designation: ""
+    country: "",
+   
 
 });
 
 
-const registerUser = () => {
+
+const registerUser = async() => {
 
     console.log({
         role: role.value,
         ...form.value
     });
+
+    if (form.value.password !== form.value.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+    }
+    const roleId = role.value === "candidate" ? 1 : 2;
+    var response = await register({
+        FirstName :form.value.FirstName,
+        LastName :form.value.LastName,
+        Country :form.value.country,
+        CompanyName:form.value.companyName,
+        Email: form.value.email,
+        Password :form.value.password,
+        RoleId :roleId
+    })
+    toast.success("Registration successfull");
+     localStorage.setItem(
+            "token",
+            response.data.token
+        );
+
+
+        const actorType = getActorType();
+
+
+        if(actorType === "candidate")
+        {
+            router.push("/candidateDashboard");
+        }
+        else if(actorType === "recruiter")
+        {
+            router.push("/recruiterDashboard");
+        }
+        else
+        {
+            router.push("/login");
+        }
 
     // later API call
 };
@@ -119,18 +162,18 @@ const goToLogin = () => {
 
                 <form @submit.prevent="registerUser">
 
+                    <div class="Namecontainer">
+                        <input v-model="form.FirstName" placeholder="FirstName" required />
+                        
+                        <input v-model="form.LastName" placeholder="LastName" required />
+                    </div>
+                    <input v-model="form.email" placeholder="Email Address" required />
+                    
+                    <input type="password" v-model="form.password" placeholder="Password" required />
 
-                    <input v-model="form.Name" placeholder="Name" />
-
-                    <input v-model="form.email" placeholder="Email Address" />
 
 
-
-                    <input type="password" v-model="form.password" placeholder="Password" />
-
-
-
-                    <input type="password" v-model="form.confirmPassword" placeholder="Confirm Password" />
+                    <input type="password" v-model="form.confirmPassword" placeholder="Confirm Password" required />
 
 
 
@@ -142,20 +185,20 @@ const goToLogin = () => {
                     <div v-if="role === 'recruiter'">
 
 
-                        <input v-model="form.companyName" placeholder="Company Name" />
+                        <input v-model="form.companyName" placeholder="Company Name" required />
 
 
 
-                        <input v-model="form.designation" placeholder="Designation" />
+                    </div>
 
-
+                    <div v-if="role === 'candidate'">
+                        <input v-model="form.country" placeholder="Country" required />
                     </div>
 
 
 
 
-
-                    <button class="register-btn">
+                    <button type="submit" class="register-btn" >
 
                         Register
 
@@ -275,6 +318,10 @@ const goToLogin = () => {
 }
 
 
+.Namecontainer {
+    display: flex;
+    gap: 10px;
+}
 
 .register-card {
 

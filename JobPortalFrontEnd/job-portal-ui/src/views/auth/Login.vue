@@ -2,13 +2,55 @@
 import { ref } from "vue";
 import login_bg from '@/assets/login_bg.jpg'
 import { useRouter } from "vue-router";
+import { getActorType } from "@/utils/auth.ts";
+import { login } from "@/services/authService";
 const email = ref("");
 const password = ref("");
 
-const login = () => {
-    console.log(email.value);
-    console.log(password.value);
-};
+const handleLogin = async()=>{
+
+    try{
+
+        const response = await login({
+
+            email:email.value,
+            password:password.value
+
+        });
+
+
+        localStorage.setItem(
+            "token",
+            response.data.token
+        );
+
+
+        const actorType = getActorType();
+
+
+        if(actorType === "candidate")
+        {
+            router.push("/candidateDashboard");
+        }
+        else if(actorType === "recruiter")
+        {
+            router.push("/recruiterDashboard");
+        }
+        else
+        {
+            router.push("/login");
+        }
+
+
+    }
+    catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
 const router = useRouter();
 
 
@@ -38,7 +80,7 @@ const goToRegister = () => {
                 placeholder="Password"
             />
 
-            <button @click="login">
+            <button @click="handleLogin">
                 Login
             </button>
 

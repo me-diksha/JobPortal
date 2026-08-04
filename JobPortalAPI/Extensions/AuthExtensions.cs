@@ -1,4 +1,5 @@
 ﻿using JobPortalAPI.Common;
+using JobPortalAPI.Services;
 using JobPortalAPI.Services.Abstractions;
 using JobPortalAPI.Services.Implementations;
 using JobPortalAPI.Settings;
@@ -17,6 +18,7 @@ namespace JobPortalAPI.Extensions
 
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
+            
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

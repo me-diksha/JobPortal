@@ -1,5 +1,6 @@
 ﻿using JobPortalAPI.Repositories;
 using JobPortalAPI.Repositories.Abstractions;
+using JobPortalAPI.Services;
 using JobPortalAPI.Services.Abstractions;
 using JobPortalAPI.Services.Implementations;
 using JobPortalAPI.Settings;
@@ -16,6 +17,8 @@ namespace JobPortalAPI.Extensions
             services.AddScoped<ICandidateRepository,CandidateRepository>();
             services.AddScoped<IRecruiterService, RecruiterService>();
             services.AddScoped<IRecruiterRepository, RecruiterRepository>();
+            services.AddScoped<ICompanyService, CompanyService>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
             return services;
         }
     }

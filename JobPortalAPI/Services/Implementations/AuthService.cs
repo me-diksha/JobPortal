@@ -2,6 +2,7 @@
 using JobPortalAPI.Common;
 using JobPortalAPI.DataAccess;
 using JobPortalAPI.Models.Common;
+using JobPortalAPI.Models.Requests;
 using JobPortalAPI.Models.Responses;
 using JobPortalAPI.Repositories.Abstractions;
 using JobPortalAPI.Services.Abstractions;
@@ -14,11 +15,18 @@ namespace JobPortalAPI.Services.Implementations
         private readonly IAuthRepository _authRepository;
         private readonly ILogger<AuthService> _logger;
         private readonly IJwtService _jwtService;
-        public AuthService(IAuthRepository authRepository, ILogger<AuthService> logger, IJwtService jwtService)
+        private readonly ICandidateService _candidateService;
+        private readonly IRecruiterService _recruiterService;
+        private readonly ICompanyService _companyService;
+        public AuthService(IAuthRepository authRepository, ILogger<AuthService> logger, IJwtService jwtService, ICandidateService candidateService,IRecruiterService recruiterService,ICompanyService companyService)
         {
             _authRepository = authRepository;
             _logger = logger;
             this._jwtService = jwtService;
+            _candidateService= candidateService;
+            _recruiterService= recruiterService;
+            _companyService= companyService;
+            
         }
 
         public async Task<AuthResponse?> Register(Models.Requests.RegisterRequest request) {
@@ -34,15 +42,45 @@ namespace JobPortalAPI.Services.Implementations
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var user = new User
             {
-                Name = request.Name,
+                Name = request.FirstName,
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 RoleId = request.RoleId
             };
             var newUserId = await _authRepository.CreateUser(user);
-
+            
             if (newUserId <= 0)
                 return null;
+            if (request.RoleId == 1)
+            {
+                var requestTocreateProfile = new CreateCandidateProfileRequest
+                {
+                    Firstname = request.FirstName,
+                    LastName= request.LastName,
+                    Country = request.Country
+
+                };
+                await _candidateService.CreateProfile(
+                    (int)newUserId,
+                     requestTocreateProfile
+                );
+            }
+            if(request.RoleId == 2)
+            {   
+                var createcompany = new Company
+                {
+                    Name = request.CompanyName
+                };
+                var companyid= await _companyService.CreateCompany(createcompany);
+                var requestToCreateProfile = new RecruiterProfileRequest
+                {
+                    CompanyId = companyid,
+                    FirstName= request.FirstName,
+                    LastName= request.LastName,
+            
+                };
+                await _recruiterService.CreateProfile(requestToCreateProfile, (int)newUserId);
+            }
             var roleName = GetRoleName(user.RoleId);
             var permissions = GetPermissions(user.RoleId);
             var token = _jwtService.GenerateAccessToken(

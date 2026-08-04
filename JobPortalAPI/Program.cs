@@ -16,6 +16,18 @@ builder.Services.AddServices(builder.Configuration);
 builder.Services.AddSwaggerServices();
 SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
+//adding cors policy for allowing browser to make connection with our api
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueApp",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -27,6 +39,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowVueApp");
 app.UseAuthentication();
 
 app.UseAuthorization();
