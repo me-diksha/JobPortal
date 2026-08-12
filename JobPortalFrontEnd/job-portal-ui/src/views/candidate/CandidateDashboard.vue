@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import Sidebar from "@/components/common/SideBar.vue";
+import logo from "@/assets/JobPortal_logo.png";
 const router = useRouter();
 
 
@@ -17,16 +19,53 @@ const toggleProfile = () => {
 const handlelogout = () => {
 
 }
+const candidateMenu = [
+
+{
+ name:"Home",
+ icon:"🏠",
+ path:"/candidateDashboard"
+},
+
+
+{
+ name:"Browse Jobs",
+ icon:"💼",
+ path:"/jobs"
+},
+
+{
+ name:"Applications",
+ icon:"📄",
+ path:"/applications"
+},
+
+{
+ name:"Saved Jobs",
+ icon:"⭐",
+ path:"/savedJobs"
+}
+
+];
+const bottomMenu = [
+  { name: "Preferences", icon: "⚙" },
+  { name: "Dark Mode", icon: "🌙" },
+  { name: "Help Center", icon: "💬" }
+];
 </script>
 
 
 <template>
 
     <div class="dashboard">
-
+        <Sidebar companyName="Jobsy"
+       slogan="Find Your Sea"
+       :logo="logo"
+       :menuItems="candidateMenu"
+      :bottomMenu="bottomMenu"/>
 
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- <aside class="sidebar">
             <div class="brand">
                 <img src="@/assets/JobPortal_logo.png" class="logo-img" />
                 <div class="brand-text">
@@ -35,7 +74,7 @@ const handlelogout = () => {
                 </div>
             </div>
 
-            <!-- <div class="user-info">
+             <div class="user-info">
 
         <img 
         src="@/assets/user.png"
@@ -44,7 +83,7 @@ const handlelogout = () => {
 
         <h3>John Doe</h3>
 
-    </div> -->
+    </div> 
 
 
 
@@ -84,7 +123,7 @@ const handlelogout = () => {
             </div>
 
 
-        </aside>
+        </aside> -->
 
 
 

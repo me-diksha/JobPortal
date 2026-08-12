@@ -1,10 +1,43 @@
 <script setup lang="ts">
 
 import { ref } from "vue";
-
+import Sidebar from "@/components/common/SideBar.vue";
+import logo from "@/assets/JobPortal_logo.png";
 
 const isEdit = ref(false);
+const candidateMenu = [
 
+    {
+        name: "Home",
+        icon: "🏠",
+        path: "/candidateDashboard"
+    },
+
+
+    {
+        name: "Browse Jobs",
+        icon: "💼",
+        path: "/jobs"
+    },
+
+    {
+        name: "Applications",
+        icon: "📄",
+        path: "/applications"
+    },
+
+    {
+        name: "Saved Jobs",
+        icon: "⭐",
+        path: "/savedJobs"
+    }
+
+];
+const bottomMenu = [
+    { name: "Preferences", icon: "⚙" },
+    { name: "Dark Mode", icon: "🌙" },
+    { name: "Help Center", icon: "💬" }
+];
 
 
 const profile = ref({
@@ -75,376 +108,86 @@ const saveProfile = () => {
 
 <template>
 
-
-    <div class="profile-page">
-
-
-
-        <div class="profile-header">
+    <div class="dashboard">
+        <Sidebar companyName="Jobsy" slogan="Find Your Sea" :logo="logo" :menuItems="candidateMenu"
+            :bottomMenu="bottomMenu" />
+        <section class="main">
 
 
-            <img src="@/assets/user.png" class="profile-img" />
+            <header class="topbar">
+
+                <h2>
+                    Candidate Profile
+                </h2>
 
 
-
-            <div>
-
-                <h1>
-                    {{ profile.name }}
-                </h1>
-
-
-                <p>
-                    {{ profile.headline }}
-                </p>
-
-
-            </div>
-
-
-            <button @click="editProfile">
-
-                {{ isEdit ? "Cancel" : "Edit Profile" }}
-
-            </button>
+            </header>
 
 
 
-        </div>
+            <div class="profile-page">
 
 
+                <ProfileHeader :profile="profile" />
 
 
-
-        <!-- About -->
-
-        <div class="section">
+                <AboutCard :profile="profile" />
 
 
-            <h2>
-                About
-            </h2>
+                <SkillsCard :skills="profile.skills" />
 
 
-            <div v-if="!isEdit">
+                <EducationCard :education="profile.education" />
 
 
-                <p>
-                    {{ profile.bio }}
-                </p>
-
-
-                <p>
-                    📍 {{ profile.location }}
-                </p>
-
-
-                <p>
-                    Expected Salary:
-                    {{ profile.expectedSalary }}
-                </p>
+                <ExperienceCard :experience="profile.experience" />
 
 
             </div>
 
 
-
-
-            <div v-else>
-
-
-                <textarea v-model="profile.bio" />
-
-
-                <input v-model="profile.location" />
-
-
-                <input v-model="profile.expectedSalary" />
-
-
-            </div>
-
-
-        </div>
-
-
-
-
-
-        <!-- Skills -->
-
-
-        <div class="section">
-
-
-            <h2>
-                Skills
-            </h2>
-
-
-            <div class="skills">
-
-
-                <span v-for="skill in profile.skills" :key="skill">
-
-                    {{ skill }}
-
-                </span>
-
-
-            </div>
-
-
-        </div>
-
-
-
-
-
-
-        <!-- Education -->
-
-
-        <div class="section">
-
-
-            <h2>
-                Education
-            </h2>
-
-
-
-            <div v-for="edu in profile.education" :key="edu.degree" class="card">
-
-
-                <h3>
-                    {{ edu.degree }}
-                </h3>
-
-
-                <p>
-                    {{ edu.institute }}
-                </p>
-
-
-                <p>
-                    {{ edu.year }}
-                </p>
-
-
-            </div>
-
-
-        </div>
-
-
-
-
-
-
-        <!-- Experience -->
-
-
-        <div class="section" id="experience">
-
-
-            <h2>
-                Experience
-            </h2>
-
-
-            <div v-for="exp in profile.experience" :key="exp.company" class="card">
-
-
-                <h3>
-                    {{ exp.role }}
-                </h3>
-
-
-                <p>
-                    {{ exp.company }}
-                </p>
-
-
-                <p>
-                    {{ exp.duration }}
-                </p>
-
-
-            </div>
-
-
-
-        </div>
-
-
-
-        <button v-if="isEdit" class="save-btn" @click="saveProfile">
-
-            Save Changes
-
-        </button>
-
-
-
+        </section>
     </div>
-
 
 </template>
 <style scoped>
-.profile-page {
+.dashboard{
 
-    padding: 30px;
-    background: #f5f7fb;
-    height:100vh;
-    overflow-y: auto;
-    
+display:flex;
+height:100vh;
 
+}
+
+
+.main{
+
+flex:1;
+background:#f5f7fb;
+
+height:100vh;
+
+overflow-y:auto;
+
+}
+
+
+.topbar{
+
+height:70px;
+background:white;
+
+display:flex;
+align-items:center;
+
+padding:0 30px;
 
 }
 
 
 
-.profile-header {
+.profile-page{
 
-    background: white;
-
-    padding: 25px;
-
-    border-radius: 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 20px;
-
-}
-
-
-
-.profile-img {
-
-    width: 100px;
-
-    height: 100px;
-
-    border-radius: 50%;
-
-}
-
-
-
-.profile-header button {
-
-    margin-left: auto;
-
-    padding: 12px 25px;
-
-    background: rgb(24, 46, 107);
-
-    color: white;
-
-    border: none;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-}
-
-
-
-.section {
-
-    background: white;
-
-    margin-top: 25px;
-
-    padding: 25px;
-
-    border-radius: 15px;
-
-}
-
-
-
-.section h2 {
-
-    color: rgb(24, 46, 107);
-
-}
-
-
-
-.skills {
-
-    display: flex;
-
-    gap: 10px;
-
-}
-
-
-
-.skills span {
-
-    background: #e8edff;
-
-    padding: 8px 15px;
-
-    border-radius: 20px;
-
-}
-
-
-
-.card {
-
-    padding: 15px;
-
-    border: 1px solid #eee;
-
-    border-radius: 10px;
-
-    margin-top: 15px;
-
-}
-
-#experience{
-    margin-bottom: 30px;
-}
-
-textarea,
-input {
-
-    width: 100%;
-
-    padding: 12px;
-
-    margin: 8px 0;
-
-    border: 1px solid #ddd;
-
-    border-radius: 8px;
-
-}
-
-
-
-.save-btn {
-
-    margin-top: 20px;
-
-    padding: 15px 30px;
-
-    background: green;
-
-    color: white;
-
-    border: none;
-
-    border-radius: 8px;
+padding:30px;
 
 }
 </style>

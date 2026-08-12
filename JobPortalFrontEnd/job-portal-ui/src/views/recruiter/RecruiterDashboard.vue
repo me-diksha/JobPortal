@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-
+import logo from "@/assets/JobPortal_logo.png"
+import Sidebar from "@/components/common/SideBar.vue";
 const showProfileMenu = ref(false);
 
 const toggleProfile = () => {
@@ -15,6 +16,20 @@ const handleLogout = () => {
     // redirect later
     // router.push("/login");
 };
+const recruiterMenu = [
+  { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
+  { name: "Company Profile", icon: "🏢", path: "/company" },
+  { name: "Post Job", icon: "📢", path: "/postJob" },
+  { name: "Manage Jobs", icon: "💼", path: "/manageJobs" },
+  { name: "Candidates", icon: "👥", path: "/candidates" },
+  { name: "Interviews", icon:"📅", path: "/interview"},
+  {name: "Shortlisted", icon:"⭐", path: "shortlisted"}
+];
+const bottomMenu = [
+  { name: "Preferences", icon: "⚙" },
+  { name: "Dark Mode", icon: "🌙" },
+  { name: "Help Center", icon: "💬" }
+];
 
 </script>
 
@@ -25,8 +40,14 @@ const handleLogout = () => {
 
 
         <!-- Sidebar -->
-
-        <aside class="sidebar">
+        <Sidebar
+        companyName="Jobsy"
+        slogan="Find Your Sea"
+        :logo="logo"
+        :menuItems="recruiterMenu"
+        :bottomMenu="bottomMenu"
+/>
+        <!-- <aside class="sidebar">
 
 
             <div class="brand">
@@ -93,7 +114,7 @@ const handleLogout = () => {
             </div>
 
 
-        </aside>
+        </aside> -->
 
 
 
