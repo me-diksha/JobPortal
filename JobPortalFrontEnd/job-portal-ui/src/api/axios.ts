@@ -1,28 +1,37 @@
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
 
 const api = axios.create({
-    baseURL: "https://localhost:7237/api", // changed according to 
+    baseURL: "https://localhost:7237/api",
     headers: {
-        "Content-Type": "application/json",
-    },
+        "Content-Type": "application/json"
+    }
 });
 
-
-// Automatically attach JWT token
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("token");
 
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        const authStore = useAuthStore();
+
+        const isAuthRequest =
+            config.url?.includes("/auth/login") ||
+            config.url?.includes("/auth/register");
+
+        if (
+            !isAuthRequest &&
+            authStore.accessToken
+        ) {
+
+            config.headers.Authorization =
+                `Bearer ${authStore.accessToken}`;
         }
 
         return config;
     },
+
     (error) => {
         return Promise.reject(error);
     }
 );
-
 
 export default api;

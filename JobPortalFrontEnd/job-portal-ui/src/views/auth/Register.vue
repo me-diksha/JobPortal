@@ -3,8 +3,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router"
 import { useToast } from "vue-toastification"
-import {register} from "@/services/authService"
-import { getActorType } from "@/utils/auth.ts";
+import {register} from "@/composables/Auth/UseRegister"
+import { useAuthStore } from "@/stores/authStore";
+import { roles } from "@/common/PermissionRoles";
 const toast = useToast();
 const router = useRouter();
 
@@ -27,7 +28,7 @@ const form = ref({
 
 
 const registerUser = async() => {
-
+    const authStore = useAuthStore();
     console.log({
         role: role.value,
         ...form.value
@@ -37,7 +38,7 @@ const registerUser = async() => {
         toast.error("Passwords do not match");
         return;
     }
-    const roleId = role.value === "candidate" ? 1 : 2;
+    const roleId = role.value === "candidate" ? roles.Candidate : roles.Recruiter;
     var response = await register({
         FirstName :form.value.FirstName,
         LastName :form.value.LastName,
@@ -48,20 +49,14 @@ const registerUser = async() => {
         RoleId :roleId
     })
     toast.success("Registration successfull");
-     localStorage.setItem(
-            "token",
-            response.data.token
-        );
+    authStore.setToken(response.data.token);
 
 
-        const actorType = getActorType();
-
-
-        if(actorType === "candidate")
+        if(authStore.actorType === roles.Candidate)
         {
             router.push("/candidateDashboard");
         }
-        else if(actorType === "recruiter")
+        else if(authStore.actorType === roles.Recruiter)
         {
             router.push("/recruiterDashboard");
         }

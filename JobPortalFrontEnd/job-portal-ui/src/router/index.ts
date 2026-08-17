@@ -4,7 +4,9 @@ import CandidateDashboard from "../views/candidate/CandidateDashboard.vue";
 import RecruiterDashboard from '@/views/recruiter/RecruiterDashboard.vue';
 import Register from '@/views/auth/Register.vue';
 import CandidateProfile from "@/views/candidate/CandidateProfile.vue";
-import { getActorType } from '@/utils/auth.ts';
+import { useAuthStore } from '@/stores/authStore.ts';
+import { roles } from '@/common/PermissionRoles.ts';
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -21,7 +23,7 @@ const router = createRouter({
       component: CandidateDashboard,
       meta: {
         requiresAuth: true,
-        role: "candidate"
+        role: roles.Candidate
       }
     },
     {
@@ -29,7 +31,7 @@ const router = createRouter({
       component: RecruiterDashboard,
       meta: {
         requiresAuth: true,
-        role: "recruiter"
+        role: roles.Recruiter
       }
     },
     {
@@ -41,27 +43,30 @@ const router = createRouter({
       component: CandidateProfile,
       meta: {
         requiresAuth: true,
-        role: "candidate"
+        role: roles.Candidate
       }
     }
   ],
 })
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
 
-  if (to.meta.requiresAuth && !token) {
-    return next("/login");
-  }
+    const authStore = useAuthStore();
 
-  if (to.meta.role) {
-    const role = getActorType();
+    // Protected route
+    if (to.meta.requiresAuth) {
 
-    if (role !== to.meta.role) {
-      return next("/login");
+        // No token -> login
+        if (!authStore.isAuthenticated) {
+            return next("/login");
+        }
+
+        // Check role
+        if (to.meta.role && authStore.actorType !== to.meta.role) {
+            return next("/login");
+        }
     }
-  }
 
-  next();
+    next();
 });
 export default router
 

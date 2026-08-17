@@ -2,50 +2,49 @@
 import { ref } from "vue";
 import login_bg from '@/assets/login_bg.jpg'
 import { useRouter } from "vue-router";
-import { getActorType } from "@/utils/auth.ts";
-import { login } from "@/services/authService";
+import { login } from "@/composables/Auth/UseLogin.ts";
+import { HTTP_StatusCodes } from "@/components/common/enum/HTTP_StatusCodes";
+import { useToast } from "vue-toastification";
+import { useAuthStore } from "@/stores/authStore";
+import { roles } from "@/common/PermissionRoles";
 const email = ref("");
 const password = ref("");
+const toast = useToast();
+const handleLogin = async () => {
 
-const handleLogin = async()=>{
-
-    try{
-
+    try {
+        const authStore = useAuthStore();
         const response = await login({
 
-            email:email.value,
-            password:password.value
+            email: email.value,
+            password: password.value
 
         });
+        if (response.status == HTTP_StatusCodes.OK) {
 
 
-        localStorage.setItem(
-            "token",
-            response.data.token
-        );
+            toast.success("Registration successfull");
+           
 
+            authStore.setToken(response.data.token);
 
-        const actorType = getActorType();
-
-
-        if(actorType === "candidate")
-        {
-            router.push("/candidateDashboard");
-        }
-        else if(actorType === "recruiter")
-        {
-            router.push("/recruiterDashboard");
-        }
-        else
-        {
-            router.push("/login");
+            if (authStore.actorType === roles.Candidate) {
+                router.push("/candidateDashboard");
+            }
+            else if (authStore.actorType === roles.Recruiter) {
+                router.push("/recruiterDashboard");
+            }
+            else {
+                router.push("/login");
+            }
         }
 
 
     }
-    catch(error){
-
+    catch (error: unknown) {
+        toast.error("Invalid User");
         console.log(error);
+        return;
 
     }
 
@@ -67,28 +66,20 @@ const goToRegister = () => {
             <h1>Job Portal</h1>
 
             <h2>Welcome Back</h2>
+            <form @submit.prevent="handleLogin">
+                <input v-model="email" type="email" placeholder="Email" required />
 
-            <input
-                v-model="email"
-                type="email"
-                placeholder="Email"
-            />
+                <input v-model="password" type="password" placeholder="Password" required />
 
-            <input
-                v-model="password"
-                type="password"
-                placeholder="Password"
-            />
-
-            <button @click="handleLogin">
-                Login
-            </button>
-
+                <button type="submit">
+                    Login
+                </button>
+            </form>
             <p class="register-text">
                 Don't have an account?
                 <span @click="goToRegister" class="register">
-        Register
-    </span>
+                    Register
+                </span>
             </p>
 
         </div>
@@ -96,7 +87,6 @@ const goToRegister = () => {
 </template>
 
 <style scoped>
-
 :global(body) {
     margin: 0;
     padding: 0;
@@ -121,68 +111,69 @@ const goToRegister = () => {
     background: white;
     padding: 35px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
 }
 
-h1{
-    text-align:center;
-    margin-bottom:5px;
+h1 {
+    text-align: center;
+    margin-bottom: 5px;
 }
 
-h2{
-    text-align:center;
-    color:gray;
-    margin-bottom:30px;
+h2 {
+    text-align: center;
+    color: gray;
+    margin-bottom: 30px;
 }
 
-input{
+input {
 
-    width:100%;
-    padding:12px;
-    margin-bottom:18px;
-    border:1px solid #ccc;
-    border-radius:6px;
-    font-size:16px;
-    box-sizing:border-box;
-
-}
-
-button{
-
-    width:100%;
-    padding:12px;
-    background:rgb(24, 46, 107);
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-size:16px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
 
 }
 
-button:hover{
+button {
 
-    background:#1565c0;
+    width: 100%;
+    padding: 12px;
+    background: rgb(24, 46, 107);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+
+}
+
+button:hover {
+
+    background: #1565c0;
 
 }
 
-p{
+p {
 
-    margin-top:20px;
-    text-align:center;
+    margin-top: 20px;
+    text-align: center;
+
+}
+
+a {
+
+    text-decoration: none;
 
 }
 
-a{
-
-    text-decoration:none;
-
-}
-.register{
-    color:rgb(24, 46, 107);
-}
-.register:hover{
-    color:#1565c0;
+.register {
+    color: rgb(24, 46, 107);
 }
 
+.register:hover {
+    color: #1565c0;
+}
 </style>
