@@ -6,7 +6,7 @@ interface JwtPayload {
     exp?: number;
     sub?: string;
     email?: string;
-    actor_type?: number;
+    actor_type?: string;
 }
 
 export const useAuthStore = defineStore(
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore(
         );
 
         const userId = ref<number | null>(null);
-        const actorType = ref<number | null>(null);
+        const actorType = ref<string | null>(null);
         const email = ref<string | null>(null);
 
 

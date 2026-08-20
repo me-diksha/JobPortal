@@ -58,7 +58,7 @@ namespace JobPortalAPI.Controllers
                     Message = "User already exists or invalid role"
                 });
             }
-            _logger.LogInformation("User regitsred successfully");
+            _logger.LogInformation("User registered successfully");
             return Ok(response);
         }
     }

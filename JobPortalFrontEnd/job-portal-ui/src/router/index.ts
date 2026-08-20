@@ -48,25 +48,29 @@ const router = createRouter({
     }
   ],
 })
-router.beforeEach((to, from, next) => {
-
+router.beforeEach((to) => {
     const authStore = useAuthStore();
 
-    // Protected route
-    if (to.meta.requiresAuth) {
-
-        // No token -> login
-        if (!authStore.isAuthenticated) {
-            return next("/login");
-        }
-
-        // Check role
-        if (to.meta.role && authStore.actorType !== to.meta.role) {
-            return next("/login");
-        }
+    // Route doesn't require authentication
+    if (!to.meta.requiresAuth) {
+        return true;
     }
 
-    next();
+    // User is not authenticated
+    if (!authStore.isAuthenticated) {
+        return "/login";
+    }
+
+    // User doesn't have the required role
+    if (
+        to.meta.role &&
+        authStore.actorType !== to.meta.role
+    ) {
+        return "/login";
+    }
+
+    // Allow navigation
+    return true;
 });
 export default router
 

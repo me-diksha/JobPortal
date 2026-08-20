@@ -1,5 +1,5 @@
 export enum roles{
-    Candidate =1,
-    Recruiter =2,
-    Admin =3
+    Candidate ="candidate",
+    Recruiter ="recruiter",
+    Admin ="admin"
 }

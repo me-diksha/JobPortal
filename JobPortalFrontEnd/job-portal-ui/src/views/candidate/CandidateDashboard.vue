@@ -1,11 +1,34 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Sidebar from "@/components/common/SideBar.vue";
 import logo from "@/assets/JobPortal_logo.png";
+import  {GetCandidateProfileDetails}  from "@/composables/CandidateProfile/UseGetCandidateProfile";
+import type { CandidateProfile as CandidateProfileType } from "@/types/candidate";
 const router = useRouter();
+const candidateProfile = ref<CandidateProfileType | null>(null);
+const loading = ref(false);
+const error = ref("");
+const getCandidateProfile = async () => {
+    try {
+        loading.value = true;
+        error.value = "";
 
+        const response = await GetCandidateProfileDetails();
 
+        candidateProfile.value = response.data;
+
+        console.log("Candidate Profile:", response.data);
+    } catch (err) {
+        console.error("Error fetching candidate profile:", err);
+        error.value = "Unable to load profile details.";
+    } finally {
+        loading.value = false;
+    }
+};
+onMounted(() => {
+    getCandidateProfile();
+});
 const goToProfile = () => {
 
     router.push("/candidateprofile");
@@ -64,69 +87,6 @@ const bottomMenu = [
        :menuItems="candidateMenu"
       :bottomMenu="bottomMenu"/>
 
-        <!-- Sidebar -->
-        <!-- <aside class="sidebar">
-            <div class="brand">
-                <img src="@/assets/JobPortal_logo.png" class="logo-img" />
-                <div class="brand-text">
-                    <h2 class="company">Jobsy</h2>
-                    <p class="slogan">Find Your Sea</p>
-                </div>
-            </div>
-
-             <div class="user-info">
-
-        <img 
-        src="@/assets/user.png"
-        class="profile-img"
-        />
-
-        <h3>John Doe</h3>
-
-    </div> 
-
-
-
-
-            <div class="menu-item ">
-                🏠 Home
-            </div>
-            <div class="menu-item">
-                ♟ My Jobs
-            </div>
-
-
-            <div class="menu-item">
-                📄 Applications
-            </div>
-
-
-            <div class="menu-item">
-                👥 Browse Talent
-            </div>
-
-
-            <div class="bottom-menu">
-
-                <div>
-                    ⚙ Preferences
-                </div>
-
-                <div>
-                    🌙 Dark Mode
-                </div>
-
-                <div>
-                    💬 Help Center
-                </div>
-
-            </div>
-
-
-        </aside> -->
-
-
-
         <!-- Main Area -->
 
         <section class="main">
@@ -147,15 +107,15 @@ const bottomMenu = [
 
 
 
-                <div class="profile-dropdown">
+                <div class="profile-dropdown" >
 
 
-                    <div class="profile-button" @click="toggleProfile">
+                    <div v-if="candidateProfile" class="profile-button" @click="toggleProfile">
 
                         <img src="@/assets/user.png" alt="User Photo" />
 
-                        <span>
-                            John Doe
+                        <span >
+                            {{ candidateProfile.firstname }}
                         </span>
 
                         ▼
@@ -185,35 +145,38 @@ const bottomMenu = [
             </header>
 
 
-            <div class="profile-card">
+           <div class="profile-card">
 
+    <div v-if="loading">
+        Loading profile...
+    </div>
 
-                <h1>
-                    Welcome John 👋
-                </h1>
+    <div v-else-if="error">
+        {{ error }}
+    </div>
 
+    <div v-else-if="candidateProfile">
 
-                <div class="details">
+        <h1>
+            Welcome {{ candidateProfile.firstname }} 👋
+        </h1>
 
-                    <p>
-                        <b>Email:</b> john@gmail.com
-                    </p>
+        <div class="details">
 
+            <p>
+                <b>Headline:</b>
+                {{ candidateProfile.headline || "Not provided" }}
+            </p>
 
-                    <p>
-                        <b>Location:</b> Delhi
-                    </p>
+        </div>
 
+    </div>
 
-                    <p>
-                        <b>Skills:</b> .NET, Vue, PostgreSQL
-                    </p>
+    <div v-else>
+        No profile found.
+    </div>
 
-
-                </div>
-
-
-            </div>
+</div>
 
 
 

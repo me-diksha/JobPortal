@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import login_bg from '@/assets/login_bg.jpg'
 import { useRouter } from "vue-router";
-import { login } from "@/composables/Auth/UseLogin.ts";
+import { login } from "@/composables/Auth/UseLogin";
 import { HTTP_StatusCodes } from "@/components/common/enum/HTTP_StatusCodes";
 import { useToast } from "vue-toastification";
 import { useAuthStore } from "@/stores/authStore";
@@ -22,10 +22,8 @@ const handleLogin = async () => {
         });
         if (response.status == HTTP_StatusCodes.OK) {
 
-
-            toast.success("Registration successfull");
+            toast.success("Login successfull");
            
-
             authStore.setToken(response.data.token);
 
             if (authStore.actorType === roles.Candidate) {
