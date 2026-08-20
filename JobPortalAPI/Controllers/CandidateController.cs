@@ -64,7 +64,7 @@ namespace JobPortalAPI.Controllers
                 return NotFound();
             return Ok(response);
         }
-        [HttpDelete("{userid}")]
+        [HttpDelete("deleteprofile/{userid}")]
         public async Task<IActionResult> DeleteProfile(long userid)
         {
             var result = await _candidateService.DeleteProfile(userid);

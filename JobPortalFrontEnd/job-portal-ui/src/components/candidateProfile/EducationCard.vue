@@ -21,7 +21,6 @@ const emit = defineEmits<{
                 + Add Education
             </button>
         </div>
-
         <div v-for="education in educations" :key="education.id" class="education-block">
 
             <div class="education-content">
@@ -73,7 +72,6 @@ const emit = defineEmits<{
             </div>
 
         </div>
-
     </div>
 </template>
 

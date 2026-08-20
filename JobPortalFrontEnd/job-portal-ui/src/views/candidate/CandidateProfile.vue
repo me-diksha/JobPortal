@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import Sidebar from "@/components/common/SideBar.vue";
 import logo from "@/assets/JobPortal_logo.png";
 import ProfileHeader from "@/components/candidateProfile/ProfileHeader.vue";
@@ -9,11 +9,21 @@ import AboutCard from "@/components/candidateProfile/AboutCard.vue";
 import SkillsCard from "@/components/candidateProfile/SkillsCard.vue";
 import type { CandidateSkill } from "@/types/candidate";
 import EducationCard from "@/components/candidateProfile/EducationCard.vue";
-import type { CandidateEducation } from "@/types/candidate";
-import type { CandidateExperience } from "@/types/candidate";
+import type { CandidateEducation as CandidateEducationType} from "@/types/candidate";
+import type { CandidateExperience as CandidateExperienceType} from "@/types/candidate";
 import ExperienceCard from "@/components/candidateProfile/ExperienceCard.vue";
+import { GetCandidateProfileDetails } from "@/composables/CandidateProfile/UseGetCandidateProfile";
+import { GetCandidateSkills } from "@/composables/CandidateSkills/UseGetCandidateSkill";
+import { GetCandidateEducation } from "@/composables/CandidateEducation/UseGetCandidateEducation";
+import { GetCandidateExperience } from "@/composables/CandidateExperience/UseGetCandidateExperience";
 
 const isEdit = ref(false);
+const loading = ref(false);
+const error = ref("");
+const candidateProfile = ref<CandidateProfileType|null >(null);
+const candidateSkills = ref<CandidateSkill[] >([]);
+const candidateEducation = ref<CandidateEducationType[] >([]);
+const candidateExperienence = ref<CandidateExperienceType[] >([]);
 const candidateMenu = [
 
     {
@@ -48,129 +58,55 @@ const bottomMenu = [
     { name: "Help Center", icon: "💬" }
 ];
 
+const loadprofiledetails = async () => {
+    try {
+        loading.value = true;
+        error.value = "";
 
-const profile = ref<CandidateProfileType>({
+        const response = await GetCandidateProfileDetails();
+        candidateProfile.value = response.data;
 
-    id: 1,
+        const responseSkills = await GetCandidateSkills();
+        candidateSkills.value = responseSkills.data ?? [];
 
-    firstname: "John",
+        const responseEducation = await GetCandidateEducation();
+        candidateEducation.value = responseEducation.data ?? [];
 
-    lastName: "Doe",
+        const responseExperience = await GetCandidateExperience();
+        candidateExperienence.value = responseExperience.data ?? [];
 
-    headline: "Full Stack Developer",
-
-    bio:
-        "Software developer experienced in .NET, Vue and PostgreSQL.",
-
-    addressLine1: "123 Main Street",
-
-    addressLine2: "",
-
-    city: "Delhi",
-
-    state: "Delhi",
-
-    country: "India",
-
-    currentSalary: 600000,
-
-    expectedSalary: 800000,
-
-    resumeUrl: null
-
-});
-
-const skills = ref<CandidateSkill[]>([
-    {
-        id: 1,
-        skillId: 1,
-        skillName: ".NET",
-        experienceYears: 2
-    },
-    {
-        id: 2,
-        skillId: 2,
-        skillName: "Vue.js",
-        experienceYears: 1
-    },
-    {
-        id: 3,
-        skillId: 3,
-        skillName: "PostgreSQL",
-        experienceYears: 2
+        console.log("Candidate Profile:", response.data);
+    } catch (err) {
+        console.error("Error fetching candidate profile:", err);
+        error.value = "Unable to load profile details.";
+    } finally {
+        loading.value = false;
     }
-]);
-
-const educations = ref<CandidateEducation[]>([
-    {
-        id: 1,
-        instituteName: "ABC Senior Secondary School",
-        degree: "10th",
-        fieldOfstudy: "",
-        startYear: 2017,
-        endYear: 2018,
-        percentage: 86.5
-    },
-    {
-        id: 2,
-        instituteName: "ABC Senior Secondary School",
-        degree: "12th",
-        fieldOfstudy: "Science",
-        startYear: 2018,
-        endYear: 2020,
-        percentage: 89.2
-    },
-    {
-        id: 3,
-        instituteName: "XYZ University",
-        degree: "B.Tech",
-        fieldOfstudy: "Computer Engineering",
-        startYear: 2020,
-        endYear: 2024,
-        percentage: 82.5
-    }
-]);
-
-const experiences = ref<CandidateExperience[]>([
-    {
-        id: 1,
-        companyName: "ABC Senior Technologies",
-        designation: "Intern",
-        startDate: new Date("2018-01-01"),
-        endDate: new Date("2018-06-01"),
-        currentlyWorking: false,
-        description: ""
-    },
-    {
-        id: 2,
-        companyName: "XYZ Technologies",
-        designation: "Software Developer",
-        startDate: new Date("2024-07-01"),
-        currentlyWorking: true,
-        description: "Working on .NET Web API and Vue.js applications."
-    }
-]);
-const handleEducationEdit = (education: CandidateEducation) => {
+}
+onMounted(() => {
+ loadprofiledetails();
+})
+const handleEducationEdit = (education: CandidateEducationType) => {
     console.log("Edit:", education);
 };
 
 const handleEducationDelete = (id: number) => {
-    educations.value = educations.value.filter(
+    candidateEducation.value = candidateEducation.value.filter(
         education => education.id !== id
     );
 };
-const handleExperienceEdit = (experience: CandidateExperience) => {
+const handleExperienceEdit = (experience: CandidateExperienceType) => {
     console.log("Edit:", experience);
 };
 
 const handleExperienceDelete = (id: number) => {
-    experiences.value = experiences.value.filter(
+    candidateExperienence.value = candidateExperienence.value.filter(
         experience => experience.id !== id
     );
 };
 const updateSkills = (updatedSkills: CandidateSkill[]) => {
 
-    skills.value = updatedSkills;
+    candidateSkills.value = updatedSkills;
 
 };
 const editProfile = () => {
@@ -183,13 +119,13 @@ const updateProfile = (
     updatedProfile: CandidateProfileType
 ) => {
 
-    profile.value = updatedProfile;
+    candidateProfile.value = updatedProfile;
 
 };
 
 const saveProfile = () => {
 
-    console.log(profile.value);
+    console.log(candidateProfile.value);
 
     isEdit.value = false;
 
@@ -224,19 +160,20 @@ const saveProfile = () => {
             <div class="profile-page">
 
 
-                <ProfileHeader :profile="profile" @edit="editProfile" />
+                <ProfileHeader  v-if="candidateProfile":profile="candidateProfile" @edit="editProfile" />
 
 
-                <AboutCard :profile="profile" @update="updateProfile" />
+                <AboutCard v-if="candidateProfile":profile="candidateProfile" @update="updateProfile" />
 
 
-                <SkillsCard :skills="skills" @update="updateSkills" />
+                <SkillsCard :skills="candidateSkills" @update="updateSkills" />
 
 
-                <EducationCard :educations="educations" @edit="handleEducationEdit" @delete="handleEducationDelete" />
+                <EducationCard :educations="candidateEducation" @edit="handleEducationEdit" @delete="handleEducationDelete" />
 
 
-                <ExperienceCard :experiences="experiences" @edit=""handleExperienceEdit @delete="handleExperienceDelete" />
+                <ExperienceCard :experiences="candidateExperienence" @edit="" handleExperienceEdit
+                    @delete="handleExperienceDelete" />
 
 
             </div>
