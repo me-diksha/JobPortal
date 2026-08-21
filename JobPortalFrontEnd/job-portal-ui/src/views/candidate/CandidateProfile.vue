@@ -95,6 +95,10 @@ const handleEducationDelete = (id: number) => {
         education => education.id !== id
     );
 };
+const handleEducationAdd = async()=>{
+        const responseEducation = await GetCandidateEducation();
+        candidateEducation.value = responseEducation.data ?? [];
+}
 const handleExperienceEdit = (experience: CandidateExperienceType) => {
     console.log("Edit:", experience);
 };
@@ -104,9 +108,9 @@ const handleExperienceDelete = (id: number) => {
         experience => experience.id !== id
     );
 };
-const updateSkills = (updatedSkills: CandidateSkill[]) => {
-
-    candidateSkills.value = updatedSkills;
+const updateSkills = async() => {
+    const updatedSkills = await  GetCandidateSkills();
+    candidateSkills.value = updatedSkills.data ?? [];
 
 };
 const editProfile = () => {
@@ -169,7 +173,7 @@ const saveProfile = () => {
                 <SkillsCard :skills="candidateSkills" @update="updateSkills" />
 
 
-                <EducationCard :educations="candidateEducation" @edit="handleEducationEdit" @delete="handleEducationDelete" />
+                <EducationCard :educations="candidateEducation" @added ="handleEducationAdd" @edit="handleEducationEdit" @delete="handleEducationDelete" />
 
 
                 <ExperienceCard :experiences="candidateExperienence" @edit="" handleExperienceEdit

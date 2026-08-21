@@ -67,3 +67,13 @@ export interface CandidateExperience{
     currentlyWorking: boolean;
     description? : string;
 }
+
+
+export interface CandidateEducationRequest {
+    instituteName: string;
+    degree: string;
+    fieldOfStudy?: string;
+    startYear: number;
+    endYear: number;
+    percentage: number;
+}

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CandidateExperience } from "@/types/candidate";
+import { ref } from "vue";
 
 defineProps<{
   experiences: CandidateExperience[];
@@ -9,6 +10,7 @@ const emit = defineEmits<{
   edit: [experience: CandidateExperience];
   delete: [id: number];
 }>();
+const isAdding = ref(false);
 </script>
 
 <template>
@@ -21,7 +23,24 @@ const emit = defineEmits<{
         + Add Experience
       </button>
     </div>
+<div
+        v-if="!isAdding"
+        class="empty-state"
+    >
 
+        <div class="empty-icon">
+            💡
+        </div>
+
+        <h3>
+            No Experience added yet
+        </h3>
+
+        <p>
+            Add your Experience to help recruiters understand your expertise.
+        </p>
+
+    </div>
     <div v-for="experience in experiences" :key="experience.id" class="experience-block">
 
       <div class="experience-content">
@@ -179,5 +198,35 @@ const emit = defineEmits<{
   background: transparent;
   cursor: pointer;
   font-size: 14px;
+}
+.empty-state {
+
+    text-align: center;
+
+    padding: 35px;
+
+    color: #6b7280;
+
+}
+
+
+.empty-icon {
+
+    font-size: 35px;
+
+}
+
+
+.empty-state h3 {
+
+    color: #374151;
+
+}
+
+
+.empty-state p {
+
+    font-size: 14px;
+
 }
 </style>

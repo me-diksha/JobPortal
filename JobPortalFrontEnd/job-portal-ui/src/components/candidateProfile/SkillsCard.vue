@@ -27,14 +27,6 @@ const newSkill = ref<CandidateSkill>({
 });
 
 
-const editSkill = ref<CandidateSkill>({
-    id: 0,
-    skillId: 0,
-    skillName: "",
-    experienceYears: 0
-});
-
-
 /* =========================
    ADD SKILL
 ========================= */
@@ -93,60 +85,6 @@ const saveNewSkill = () => {
 
 
     isAdding.value = false;
-
-};
-
-
-/* =========================
-   EDIT SKILL
-========================= */
-
-const startEdit = (skill: CandidateSkill) => {
-
-    editSkill.value = {
-        ...skill
-    };
-
-    editingId.value = skill.id;
-
-};
-
-
-/* =========================
-   CANCEL EDIT
-========================= */
-
-const cancelEdit = () => {
-
-    editingId.value = null;
-
-};
-
-
-/* =========================
-   SAVE EDIT
-========================= */
-
-const saveEdit = () => {
-
-    const updatedSkills = props.skills.map(skill => {
-
-        if (skill.id === editSkill.value.id) {
-
-            return {
-                ...editSkill.value
-            };
-
-        }
-
-        return skill;
-
-    });
-
-
-    emit("update", updatedSkills);
-
-    editingId.value = null;
 
 };
 
@@ -225,11 +163,11 @@ const deleteSkill = (id: number) => {
 
             <div>
 
-                <label>Skill Name</label>
+                <label>Skill Id</label>
 
                 <input
-                    v-model="newSkill.skillName"
-                    placeholder="e.g. C#, Vue.js"
+                    v-model="newSkill.skillId"
+                    placeholder=""
                 />
 
             </div>
@@ -332,24 +270,14 @@ const deleteSkill = (id: number) => {
 
                 <div class="skill-actions">
 
-                    <button
-                        class="icon-btn"
-                        @click="startEdit(skill)"
-                        title="Edit"
-                    >
-
-                        ✏️
-
-                    </button>
-
-
+                    
                     <button
                         class="icon-btn delete"
                         @click="deleteSkill(skill.id)"
                         title="Delete"
                     >
 
-                        🗑️
+                        x
 
                     </button>
 
@@ -357,64 +285,6 @@ const deleteSkill = (id: number) => {
 
             </template>
 
-
-
-            <!-- EDIT MODE -->
-
-            <template v-else>
-
-                <div class="edit-skill-form">
-
-                    <div>
-
-                        <label>Skill Name</label>
-
-                        <input
-                            v-model="editSkill.skillName"
-                        />
-
-                    </div>
-
-
-                    <div>
-
-                        <label>Experience Years</label>
-
-                        <input
-                            type="number"
-                            min="0"
-                            v-model.number="editSkill.experienceYears"
-                        />
-
-                    </div>
-
-
-                    <div class="actions">
-
-                        <button
-                            class="cancel-btn"
-                            @click="cancelEdit"
-                        >
-
-                            Cancel
-
-                        </button>
-
-
-                        <button
-                            class="save-btn"
-                            @click="saveEdit"
-                        >
-
-                            Save
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </template>
 
         </div>
 
@@ -537,7 +407,7 @@ const deleteSkill = (id: number) => {
 
     display: grid;
 
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
 
     gap: 15px;
 

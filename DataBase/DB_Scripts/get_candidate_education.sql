@@ -1,7 +1,7 @@
 -- DROP FUNCTION public.get_candidate_education(int4);
 
 CREATE OR REPLACE FUNCTION public.get_candidate_education(p_userid integer)
- RETURNS TABLE(id integer, userid integer, institutename character varying, degree text, fieldofstudy character varying, startyear integer, endyear integer, percentage numeric)
+ RETURNS TABLE(id integer, userid integer, institutename character varying, degree character varying, fieldofstudy character varying, startyear integer, endyear integer, percentage numeric)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
