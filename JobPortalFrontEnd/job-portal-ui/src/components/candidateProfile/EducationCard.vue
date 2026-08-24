@@ -4,6 +4,7 @@ import type { CandidateEducationRequest } from "@/types/candidate";
 import { ref } from "vue";
 import { DeleteCandidateEducation } from "@/composables/CandidateEducation/UseDeleteCandidateEducation";
 import { AddCandidateEducation } from "@/composables/CandidateEducation/UseAddCandidateEducation";
+import { UpdateCandidateEducation } from "@/composables/CandidateEducation/UseUpdateCandidateEducation";
 defineProps<{
     educations: CandidateEducation[];
 }>();
@@ -13,6 +14,7 @@ const emit = defineEmits<{
     delete: [id: number];
     added: [];
 }>();
+//to add 
 const isAdding = ref(false);
 const isSaving = ref(false);
 const newEducation = ref<CandidateEducationRequest>({
@@ -49,6 +51,27 @@ const cancelAdd = () => {
     isAdding.value = false;
 };
 
+//to edit
+const isEditing = ref(false);
+const editingEducationId = ref<number | null>(null);
+
+const editEducation = (education: CandidateEducation) => {
+    editingEducationId.value = education.id;
+
+    newEducation.value = {
+        instituteName: education.instituteName,
+        degree: education.degree,
+        fieldOfStudy: education.fieldOfStudy,
+        startYear: education.startYear,
+        endYear: education.endYear,
+        percentage: education.percentage
+    };
+
+    isEditing.value = true;
+    isAdding.value = true;
+};
+
+// to save add/edit
 const saveEducation = async () => {
 
     // Clear previous errors
@@ -91,15 +114,40 @@ const saveEducation = async () => {
     if (!isValid) {
         return;
     }
+
     try {
 
         isSaving.value = true;
 
-        await AddCandidateEducation(newEducation.value);
+        const payload: CandidateEducationRequest = {
+            ...newEducation.value,
+            fieldOfStudy: newEducation.value.fieldOfStudy?.trim()
+                ? newEducation.value.fieldOfStudy.trim()
+                : null
+        };
+        // UPDATE
+        if (isEditing.value && editingEducationId.value !== null) {
 
+            await UpdateCandidateEducation(
+                editingEducationId.value,
+                payload
+            );
+
+        }
+        // ADD
+        else {
+
+            await AddCandidateEducation(
+                payload
+            );
+        }
+
+        // Close form
         isAdding.value = false;
+        isEditing.value = false;
+        editingEducationId.value = null;
 
-        // Tell parent that education was added
+        // Tell parent to refresh education list
         emit("added");
 
     } catch (error) {
@@ -112,6 +160,9 @@ const saveEducation = async () => {
 
     }
 };
+
+
+// to delete
 const deleteEducation = async (id: number) => {
 
     try {
@@ -224,7 +275,11 @@ const deleteEducation = async (id: number) => {
                 </button>
 
                 <button type="button" class="save-btn" :disabled="isSaving" @click="saveEducation">
-                    {{ isSaving ? "Saving..." : "Save Education" }}
+                    {{
+                        isSaving
+                            ? (isEditing ? "Updating..." : "Saving...")
+                            : (isEditing ? "Update Education" : "Save Education")
+                    }}
                 </button>
 
             </div>
@@ -265,8 +320,8 @@ const deleteEducation = async (id: number) => {
                         {{ education.instituteName }}
                     </p>
 
-                    <p v-if="education.fieldOfstudy" class="field">
-                        {{ education.fieldOfstudy }}
+                    <p v-if="education.fieldOfStudy" class="field">
+                        {{ education.fieldOfStudy }}
                     </p>
 
                 </div>
@@ -301,7 +356,7 @@ const deleteEducation = async (id: number) => {
 
                 <div class="actions">
 
-                    <button type="button" @click="emit('edit', education)">
+                    <button type="button" @click="editEducation(education)">
                         Edit
                     </button>
 
@@ -535,6 +590,7 @@ const deleteEducation = async (id: number) => {
 .actions button:last-child {
     color: #dc2626;
 }
+
 .error-message {
     color: #dc2626;
     font-size: 12px;

@@ -52,7 +52,7 @@ export interface CandidateEducation{
     id: number;
     instituteName : string;
     degree : string;
-    fieldOfstudy? : string;
+    fieldOfStudy? : string | null;
     startYear : number;
     endYear : number;
     percentage : number;
@@ -72,7 +72,7 @@ export interface CandidateExperience{
 export interface CandidateEducationRequest {
     instituteName: string;
     degree: string;
-    fieldOfStudy?: string;
+    fieldOfStudy?: string | null;
     startYear: number;
     endYear: number;
     percentage: number;
