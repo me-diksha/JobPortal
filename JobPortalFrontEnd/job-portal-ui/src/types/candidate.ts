@@ -62,12 +62,22 @@ export interface CandidateExperience{
     id: number;
     companyName: string;
     designation: string;
-    startDate: Date;
-    endDate? : Date;
+    startDate: string;
+    endDate? : string;
     currentlyWorking: boolean;
     description? : string;
 }
 
+export interface CandidateExperienceRequest{
+    
+    companyName: string;
+    designation: string;
+    startDate: string;
+    endDate? : string;
+    currentlyWorking: boolean;
+    description? : string;
+
+}
 
 export interface CandidateEducationRequest {
     instituteName: string;

@@ -1,7 +1,7 @@
 -- DROP FUNCTION public.get_candidate_experience(int4);
 
 CREATE OR REPLACE FUNCTION public.get_candidate_experience(p_userid integer)
- RETURNS TABLE(id integer, userid integer, companyname character varying, designation character varying, startdate date, enddate date, currentlyworking boolean, description text)
+ RETURNS TABLE(id integer, userid integer, companyname character varying, designation character varying, startdate date, enddate date, currentlyworking boolean, description character varying)
  LANGUAGE plpgsql
 AS $function$
 BEGIN

@@ -1,28 +1,27 @@
-CREATE OR REPLACE FUNCTION public.update_candidate_experience
-(
-    p_id INTEGER,
-    p_userid INTEGER,
-    p_companyname TEXT,
-    p_designation TEXT,
-    p_startdate DATE,
-    p_enddate DATE,
-    p_currentlyworking BOOLEAN,
-    p_description TEXT
+CREATE OR REPLACE FUNCTION public.update_candidate_experience(
+    p_id integer,
+    p_userid integer,
+    p_companyname text,
+    p_designation text,
+    p_startdate date,
+    p_enddate date,
+    p_currentlyworking boolean,
+    p_description text
 )
-RETURNS TABLE
-(
-    id INTEGER,
-    userid INTEGER,
-    companyname TEXT,
-    designation TEXT,
-    startdate DATE,
-    enddate DATE,
-    currentlyworking BOOLEAN,
-    description TEXT
+RETURNS TABLE(
+    id integer,
+    userid integer,
+    companyname varchar,
+    designation varchar,
+    startdate date,
+    enddate date,
+    currentlyworking boolean,
+    description varchar
 )
 LANGUAGE plpgsql
 AS $function$
 BEGIN
+
     RETURN QUERY
     UPDATE candidate_experience
     SET
@@ -32,8 +31,8 @@ BEGIN
         enddate = p_enddate,
         currentlyworking = p_currentlyworking,
         description = p_description
-    WHERE id = p_id
-      AND userid = p_userid
+    WHERE candidate_experience.id = p_id
+      AND candidate_experience.userid = p_userid
     RETURNING
         candidate_experience.id,
         candidate_experience.userid,
@@ -47,5 +46,6 @@ BEGIN
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Experience not found.';
     END IF;
+
 END;
 $function$;

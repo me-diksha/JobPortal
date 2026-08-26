@@ -100,7 +100,33 @@ export const useAuthStore = defineStore(
             sessionStorage.removeItem(
                 "accessToken"
             );
-        };
+        }
+        const restoreUserFromToken = () => {
+
+    if (!accessToken.value) {
+        return;
+    }
+
+    const payload = parseToken(accessToken.value);
+
+    if (!payload) {
+        return;
+    }
+
+    userId.value =
+        payload.sub
+            ? Number(payload.sub)
+            : null;
+
+    actorType.value =
+        payload.actor_type ?? null;
+
+    email.value =
+        payload.email ?? null;
+};
+
+restoreUserFromToken();
+        
 
 
         return {
@@ -111,6 +137,7 @@ export const useAuthStore = defineStore(
             isAuthenticated,
             setToken,
             clear
+            
         };
     }
 );
