@@ -112,11 +112,17 @@ const handleExperienceAdd = async()=>{
     const responseExperience = await GetCandidateExperience();
     candidateExperienence.value = responseExperience.data ?? [];
 }
-const updateSkills = async() => {
+const handleSkillAdded = async() => {
     const updatedSkills = await  GetCandidateSkills();
     candidateSkills.value = updatedSkills.data ?? [];
 
 };
+const handleSkillDelete = (id: number) => {
+    candidateSkills.value = candidateSkills.value.filter(
+        skill => skill.id !== id
+    );
+};
+
 const editProfile = () => {
 
     isEdit.value = !isEdit.value;
@@ -174,7 +180,7 @@ const saveProfile = () => {
                 <AboutCard v-if="candidateProfile":profile="candidateProfile" @update="updateProfile" />
 
 
-                <SkillsCard :skills="candidateSkills" @update="updateSkills" />
+                <SkillsCard :skills="candidateSkills" @added ="handleSkillAdded" @delete="handleSkillDelete" />
 
 
                 <EducationCard :educations="candidateEducation" @added ="handleEducationAdd" @edit="handleEducationEdit" @delete="handleEducationDelete" />

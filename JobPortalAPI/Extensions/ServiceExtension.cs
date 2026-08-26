@@ -19,6 +19,8 @@ namespace JobPortalAPI.Extensions
             services.AddScoped<IRecruiterRepository, RecruiterRepository>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<ICommonService, CommonService>();
+            services.AddScoped<ICommonRepository, CommonRepository>();
             return services;
         }
     }

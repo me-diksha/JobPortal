@@ -1,31 +1,64 @@
 <script setup lang="ts">
 
-import { ref } from "vue";
-import type { CandidateSkill } from "@/types/candidate";
-
-
+import { ref,onMounted } from "vue";
+import type { CandidateSkill ,CandidateSkillRequest} from "@/types/candidate";
+import { GetAllSkills } from "@/composables/Common/UseGetAllSkills";
+import type { Skills } from "@/types/Skills";
+import { AddCandidateSkills } from "@/composables/CandidateSkills/UseAddCandidateSkill";
+import { DeleteCandidateSkill } from "@/composables/CandidateSkills/UseDeletecandidateskill";
 const props = defineProps<{
     skills: CandidateSkill[]
 }>();
 
 
 const emit = defineEmits<{
-    update: [skills: CandidateSkill[]]
+    delete: [id: number];
+    added: [];
 }>();
 
 
 const isAdding = ref(false);
+const isSaving = ref(false);
+
+// Available skills from CommonController
+const availableSkills = ref<Skills[]>([]);
 
 const editingId = ref<number | null>(null);
 
 
-const newSkill = ref<CandidateSkill>({
-    id: 0,
+const newSkill = ref<CandidateSkillRequest>({
     skillId: 0,
-    skillName: "",
     experienceYears: 0
 });
 
+// Validation
+const skillError = ref("");
+const experienceError = ref("");
+
+// =========================
+// GET ALL SKILLS
+// =========================
+
+const loadSkills = async () => {
+
+    try {
+
+        const response = await GetAllSkills();
+
+        availableSkills.value = response.data;
+
+    } catch (error) {
+
+        console.error("Error fetching skills:", error);
+
+    }
+
+};
+
+// Load skills when component loads
+onMounted(()=>{
+ loadSkills();
+});
 
 /* =========================
    ADD SKILL
@@ -34,11 +67,11 @@ const newSkill = ref<CandidateSkill>({
 const startAdd = () => {
 
     newSkill.value = {
-        id: 0,
         skillId: 0,
-        skillName: "",
         experienceYears: 0
     };
+    skillError.value = "";
+    experienceError.value = "";
 
     isAdding.value = true;
 
@@ -52,6 +85,8 @@ const startAdd = () => {
 const cancelAdd = () => {
 
     isAdding.value = false;
+    skillError.value = "";
+    experienceError.value = "";
 
 };
 
@@ -60,31 +95,116 @@ const cancelAdd = () => {
    SAVE NEW SKILL
 ========================= */
 
-const saveNewSkill = () => {
+const saveNewSkill = async () => {
 
-    if (!newSkill.value.skillName.trim()) {
+    skillError.value = "";
+    experienceError.value = "";
+
+    let isValid = true;
+
+
+    // Skill validation
+    if (newSkill.value.skillId === 0) {
+
+        skillError.value = "Please select a skill";
+
+        isValid = false;
+
+    }
+
+
+    // Experience validation
+    if (
+        newSkill.value.experienceYears < 0 ||
+        newSkill.value.experienceYears === null
+    ) {
+
+        experienceError.value =
+            "Add valid Experience";
+
+        isValid = false;
+
+    }
+
+
+    if (!isValid) {
+        return;
+    }
+
+
+    // Prevent duplicate skill
+    const alreadyExists = props.skills.some(
+        skill =>
+            skill.skillId === newSkill.value.skillId
+    );
+
+
+    if (alreadyExists) {
+
+        skillError.value =
+            "This skill has already been added";
 
         return;
 
     }
 
 
-    const skill: CandidateSkill = {
+    try {
 
-        ...newSkill.value,
-
-        id: Date.now()
-
-    };
+        isSaving.value = true;
 
 
-    emit("update", [
-        ...props.skills,
-        skill
-    ]);
+        // =========================
+        // API PAYLOAD
+        // =========================
+
+        const payload: CandidateSkillRequest = {
+
+            skillId: newSkill.value.skillId,
+
+            experienceYears:
+                newSkill.value.experienceYears
+
+        };
 
 
-    isAdding.value = false;
+        // =========================
+        // ADD API
+        // =========================
+
+        const response =
+            await AddCandidateSkills(payload);
+
+
+        console.log(
+            "Skill added:",
+            response.data
+        );
+
+
+        // =========================
+        // REFRESH PARENT
+        // =========================
+
+        emit("added");
+
+
+        // Close form
+        isAdding.value = false;
+
+
+    } catch (error) {
+
+        console.error(
+            "Error adding skill:",
+            error
+        );
+
+    } finally {
+
+        isSaving.value = false;
+
+    }
 
 };
 
@@ -93,13 +213,23 @@ const saveNewSkill = () => {
    DELETE
 ========================= */
 
-const deleteSkill = (id: number) => {
+const  deleteSkill = async(id: number) => {
 
-    const updatedSkills = props.skills.filter(
-        skill => skill.id !== id
-    );
+     try {
 
-    emit("update", updatedSkills);
+        await DeleteCandidateSkill(id);
+
+        // Tell parent to remove it from UI
+        emit("delete",id);
+
+    } catch (error) {
+
+        console.error(
+            "Error deleting experience:",
+            error
+        );
+
+    }
 
 };
 
@@ -163,12 +293,39 @@ const deleteSkill = (id: number) => {
 
             <div>
 
-                <label>Skill Id</label>
+                <label>Skill</label>
 
-                <input
-                    v-model="newSkill.skillId"
-                    placeholder=""
-                />
+                <select
+                    v-model.number="newSkill.skillId"
+                >
+
+                    <option
+                        :value="0"
+                        disabled
+                    >
+                        Select a skill
+                    </option>
+
+
+                    <option
+                        v-for="skill in availableSkills"
+                        :key="skill.id"
+                        :value="skill.id"
+                    >
+
+                        {{ skill.name }}
+
+                    </option>
+
+                </select>
+                 <span
+                    v-if="skillError"
+                    class="error-message"
+                >
+
+                    {{ skillError }}
+
+                </span>
 
             </div>
 
@@ -184,6 +341,14 @@ const deleteSkill = (id: number) => {
                     placeholder="Years"
                 />
 
+                <span
+                    v-if="experienceError"
+                    class="error-message"
+                >
+
+                    {{ experienceError }}
+
+                </span>
             </div>
 
         </div>
@@ -202,7 +367,7 @@ const deleteSkill = (id: number) => {
 
 
             <button
-                class="save-btn"
+                class="save-btn"  :disabled="isSaving"
                 @click="saveNewSkill"
             >
 
@@ -710,7 +875,22 @@ const deleteSkill = (id: number) => {
     }
 
 }
+.skill-form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+}
 
+.error-message {
+    display: block;
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 2px;
+}
 
 @media (max-width: 600px) {
 

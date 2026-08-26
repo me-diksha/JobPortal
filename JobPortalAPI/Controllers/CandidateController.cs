@@ -94,7 +94,7 @@ namespace JobPortalAPI.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("skills/{id}")]
+        [HttpDelete("deleteskills/{id}")]
         public async Task<IActionResult> DeleteSkill([FromRoute] int id)
         {
             var deleted=await _candidateService.DeleteSkill(id,UserId);

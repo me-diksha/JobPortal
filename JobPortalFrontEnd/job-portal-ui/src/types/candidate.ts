@@ -47,6 +47,10 @@ export interface CandidateSkill {
     skillName: string;
     experienceYears: number;
 }
+export interface CandidateSkillRequest {
+    skillId: number;
+    experienceYears: number;
+}
 
 export interface CandidateEducation{
     id: number;
