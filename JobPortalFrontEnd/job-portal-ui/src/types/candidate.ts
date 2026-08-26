@@ -21,21 +21,21 @@ export interface CandidateProfile {
 }
 
 export interface CreateCandidateProfileRequest {
-    headline?: string;
-    bio?: string;
+    headline: string;
+    bio: string;
 
-    addressLine1?: string;
-    addressLine2?: string;
+    addressLine1: string;
+    addressLine2: string;
 
-    city?: string;
-    state?: string;
+    city: string;
+    state: string;
 
     country: string;
 
     currentSalary: number;
     expectedSalary: number;
 
-    resumeUrl?: string;
+    resumeUrl: string;
 
     firstname: string;
     lastName?: string;

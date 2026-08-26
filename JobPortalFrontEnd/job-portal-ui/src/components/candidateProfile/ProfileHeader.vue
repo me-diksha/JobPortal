@@ -4,6 +4,7 @@ import type { CandidateProfile } from "@/types/candidate";
 
 defineProps<{
     profile: CandidateProfile;
+    isEditing :boolean;
 }>();
 
 const emit = defineEmits<{
@@ -84,8 +85,7 @@ const emit = defineEmits<{
         @click="emit('edit')"
     >
 
-     Edit Profile
-
+    {{ isEditing ? "Done Editing" : "Edit Profile" }}
     </button>
 
 </div>

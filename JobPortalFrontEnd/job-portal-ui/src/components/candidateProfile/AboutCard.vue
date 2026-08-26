@@ -2,7 +2,8 @@
 
 import { ref, watch } from "vue";
 
-import type { CandidateProfile } from "@/types/candidate";
+import type { CandidateProfile , CreateCandidateProfileRequest} from "@/types/candidate";
+import { UpdateCandidateProfile } from "@/composables/CandidateProfile/UseUpdateCandidateProfile";
 
 
 const props = defineProps<{
@@ -17,7 +18,18 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 
-
+const errors = ref({
+    firstname: "",
+    country: "",
+    
+});
+const clearErrors = () => {
+    errors.value = {
+        firstname: "",
+        country: "",
+        
+    };
+};
 const editData = ref({
     headline: "",
     bio: "",
@@ -32,7 +44,10 @@ const editData = ref({
     currentSalary: 0,
     expectedSalary: 0,
 
-    resumeUrl: ""
+    resumeUrl: "",
+    firstname: "",
+    lastName: ""
+   
 });
 
 
@@ -70,7 +85,9 @@ const loadEditData = () => {
             props.profile.expectedSalary,
 
         resumeUrl:
-            props.profile.resumeUrl ?? ""
+            props.profile.resumeUrl ?? "",
+        firstname: props.profile.firstname ?? "",
+        lastName: props.profile.lastName ?? ""
 
     };
 
@@ -105,45 +122,87 @@ const cancelEdit = () => {
     Save changes
 */
 
-const saveChanges = () => {
+const saveChanges = async () => {
+     clearErrors();
 
-    emit("update", {
+    let isValid = true;
 
-        ...props.profile,
+    // First Name
+    if (!editData.value.firstname.trim()) {
+        errors.value.firstname = "First Name is required";
+        isValid = false;
+    }
 
-        headline: editData.value.headline,
+    // Country
+    if (!editData.value.country.trim()) {
+        errors.value.country = "Country is required";
+        isValid = false;
+    }
 
-        bio: editData.value.bio,
+    // Stop here if validation failed
+    if (!isValid) {
+        return;
+    }
+    try {
+        const payload: CreateCandidateProfileRequest = {
+            headline: editData.value.headline?.trim() || null,
 
-        addressLine1:
-            editData.value.addressLine1,
+            bio: editData.value.bio?.trim() || null,
 
-        addressLine2:
-            editData.value.addressLine2,
+            addressLine1:
+                editData.value.addressLine1?.trim() || null,
 
-        city:
-            editData.value.city,
+            addressLine2:
+                editData.value.addressLine2?.trim() || null,
 
-        state:
-            editData.value.state,
+            city:
+                editData.value.city?.trim() || null,
 
-        country:
-            editData.value.country,
+            state:
+                editData.value.state?.trim() || null,
 
-        currentSalary:
-            editData.value.currentSalary,
+            country:
+                editData.value.country?.trim() || "",
 
-        expectedSalary:
-            editData.value.expectedSalary,
+            currentSalary:
+                editData.value.currentSalary,
 
-        resumeUrl:
-            editData.value.resumeUrl
+            expectedSalary:
+                editData.value.expectedSalary,
 
-    });
+            resumeUrl:
+                editData.value.resumeUrl?.trim() || null,
 
+            firstname:
+                props.profile.firstname,
 
-    isEditing.value = false;
+            lastName:
+                props.profile.lastName
+        };
 
+        const response = await UpdateCandidateProfile(
+            props.profile.id,
+            payload
+        );
+
+        emit("update", {
+            ...props.profile,
+            ...payload
+        });
+
+        isEditing.value = false;
+
+        console.log(
+            "Profile updated successfully:",
+            response
+        );
+
+    } catch (error) {
+        console.error(
+            "Error updating candidate profile:",
+            error
+        );
+    }
 };
 
 
@@ -345,6 +404,30 @@ watch(
     >
 
 
+        <label>First Name  <span class="required">*</span></label>
+
+        <input
+            v-model="editData.firstname"
+            type="text"
+            placeholder="Enter first name"
+        />
+        <span
+    v-if="errors.firstname"
+    class="error-message"
+>
+    {{ errors.firstname }}
+</span>
+   
+
+    
+        <label>Last Name</label>
+
+        <input
+            v-model="editData.lastName"
+            type="text"
+            placeholder="Enter last name"
+        />
+   
         <!-- Headline -->
 
         <label>Headline</label>
@@ -352,6 +435,7 @@ watch(
         <input
             v-model="editData.headline"
             placeholder="e.g. Full Stack Developer"
+            
         />
 
 
@@ -364,6 +448,7 @@ watch(
             v-model="editData.bio"
             rows="5"
             placeholder="Tell recruiters about yourself"
+            
         ></textarea>
 
 
@@ -416,12 +501,17 @@ watch(
 
         <!-- Country -->
 
-        <label>Country</label>
+        <label>Country  <span class="required">*</span></label>
 
         <input
             v-model="editData.country"
         />
-
+<span
+    v-if="errors.country"
+    class="error-message"
+>
+    {{ errors.country }}
+</span>
 
 
         <!-- Salary -->
@@ -539,9 +629,9 @@ watch(
 
 .edit-btn {
 
-    background: white;
+    background: rgb(24, 46, 107);
 
-    color: rgb(24, 46, 107);
+    color: white;
 
     border: 1px solid rgb(24, 46, 107);
 
@@ -556,7 +646,7 @@ watch(
 
 .edit-btn:hover {
 
-    background: rgb(24, 46, 107);
+    background: #334f9c;
 
     color: white;
 
@@ -765,10 +855,46 @@ watch(
     gap: 8px;
 }
 
-.actions button {
+/* .actions button {
     border: none;
     background: transparent;
     cursor: pointer;
     font-size: 14px;
+} */
+.error-message {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 12px;
+}
+
+.input-error {
+    border: 1px solid #dc2626 !important;
+}
+
+.general-error {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+label {
+    display: block;
+    margin-bottom: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+
+/* Required star */
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
 }
 </style>

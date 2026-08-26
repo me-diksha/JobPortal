@@ -6,6 +6,8 @@ using JobPortalAPI.Models.Common;
 using JobPortalAPI.Models.Requests;
 using JobPortalAPI.Models.Responses;
 using JobPortalAPI.Repositories.Abstractions;
+using System.Diagnostics.Metrics;
+using System.Linq.Expressions;
 
 namespace JobPortalAPI.Repositories
 {
@@ -71,6 +73,38 @@ namespace JobPortalAPI.Repositories
                 _logger.LogError(ex, "Error in Getprofile");
                 throw;
             }
+        }
+        public async Task<CandidateProfile> UpdatedProfile(CandidateProfile request, int profileid)
+        {
+            try
+            {
+                const string sql = "SELECT updateprofile(@UserId,@Headline,@Bio,@CurrentSalary,@ExpectedSalary,@ResumeUrl,@AddressLine1,@AddressLine2,@City,@State,@Country,@Firstname,@LastName,@ProfileId);";
+                using var connection = _dbAccess.CreateConnection();
+                return await connection.QuerySingleAsync<CandidateProfile>(
+                    sql,
+                    new{
+                        UserId = request.UserId,
+                        Headline = request.Headline,
+                        Bio = request.Bio,
+                        CurrentSalary = request.CurrentSalary,
+                        ExpectedSalary = request.ExpectedSalary,
+                        ResumeUrl = request.ResumeUrl,
+                        AddressLine1 = request.AddressLine1,
+                        AddressLine2 = request.AddressLine2,
+                        City = request.City,
+                        State = request.State,
+                        Country = request.Country,
+                        Firstname = request.Firstname,
+                        LastName = request.LastName,
+                        ProfileId = profileid
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"error in updating profile");
+                throw;
+            }
+            
         }
         public async Task<bool> DeleteCandidateProfile(long userId)
         {

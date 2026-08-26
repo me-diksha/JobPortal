@@ -7,6 +7,7 @@ namespace JobPortalAPI.Services.Abstractions
     public interface ICandidateService
     {
         Task<int> CreateProfile( int userid,CreateCandidateProfileRequest request);
+        Task<CandidateProfileResponse> UpdateProfile( int userid,CreateCandidateProfileRequest request,int id);
         Task<bool> DeleteProfile(long userId);
         Task<int> AddSkill(int userid,CandidateSkillRequest request);
 

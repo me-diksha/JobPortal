@@ -8,6 +8,7 @@ namespace JobPortalAPI.Repositories.Abstractions
     {
         Task<int> CreateProfile(CandidateProfile request);
         Task<bool> DeleteCandidateProfile(long userId);
+        Task<CandidateProfile> UpdatedProfile(CandidateProfile request, int profileid);
         Task<int> AddSkill(CandidateSkill skill);
 
         Task<int> AddEducation(CandidateEducation education);

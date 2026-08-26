@@ -18,34 +18,44 @@ namespace JobPortalAPI.Services.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger<CandidateService> _logger;
 
-        public CandidateService(  ICandidateRepository repository,IMapper mappingProfile, ILogger<CandidateService> logger) { 
+        public CandidateService(ICandidateRepository repository, IMapper mappingProfile, ILogger<CandidateService> logger)
+        {
 
             _repository = repository;
             _mapper = mappingProfile;
             _logger = logger;
         }
         #region[Profile]
-        public async Task<int> CreateProfile(int userid,CreateCandidateProfileRequest request)
+        public async Task<int> CreateProfile(int userid, CreateCandidateProfileRequest request)
         {
-            var profile = new CandidateProfile
+            try
             {
-                UserId = userid,
-                Headline = request.Headline,
-                Bio = request.Bio,
-                CurrentSalary = request.CurrentSalary,
-                ExpectedSalary = request.ExpectedSalary,
-                ResumeUrl = request.ResumeUrl,
-                AddressLine1 = request.AddressLine1,
-                AddressLine2 = request.AddressLine2,
-                City = request.City,
-                State = request.State,
-                Country = request.Country,
-                Firstname= request.Firstname,
-                LastName=request.LastName
-            };
+                var profile = new CandidateProfile
+                {
+                    UserId = userid,
+                    Headline = request.Headline,
+                    Bio = request.Bio,
+                    CurrentSalary = request.CurrentSalary,
+                    ExpectedSalary = request.ExpectedSalary,
+                    ResumeUrl = request.ResumeUrl,
+                    AddressLine1 = request.AddressLine1,
+                    AddressLine2 = request.AddressLine2,
+                    City = request.City,
+                    State = request.State,
+                    Country = request.Country,
+                    Firstname = request.Firstname,
+                    LastName = request.LastName
+                };
 
-            return await _repository.CreateProfile(profile);
+                return await _repository.CreateProfile(profile);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "error in create profile service");
+                throw;
+            }
         }
+
         public async Task<CandidateProfile?> GetProfile(int userid)
         {
             try
@@ -84,14 +94,54 @@ namespace JobPortalAPI.Services.Implementations
                 Experience = _mapper.Map<List<CandidateExperienceResponse>>(experience)
             };
         }
+        public async Task<CandidateProfileResponse> UpdateProfile(int userid, CreateCandidateProfileRequest request, int id)
+        {
+            try
+            {
+                var profile = new CandidateProfile
+                {
+                    UserId = userid,
+                    Headline = request.Headline,
+                    Bio = request.Bio,
+                    CurrentSalary = request.CurrentSalary,
+                    ExpectedSalary = request.ExpectedSalary,
+                    ResumeUrl = request.ResumeUrl,
+                    AddressLine1 = request.AddressLine1,
+                    AddressLine2 = request.AddressLine2,
+                    City = request.City,
+                    State = request.State,
+                    Country = request.Country,
+                    Firstname = request.Firstname,
+                    LastName = request.LastName
+                };
+
+                var updatedprofile = await _repository.UpdatedProfile(profile,id);
+                return _mapper.Map<CandidateProfileResponse>(updatedprofile);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "error in updating profile");
+                throw;
+            }
+        }
         public async Task<bool> DeleteProfile(long userId)
         {
-            return await _repository.DeleteCandidateProfile(userId);
+            try
+            {
+                return await _repository.DeleteCandidateProfile(userId);
+            }
+            catch (Exception ex)
+            {
+                {
+                    _logger.LogError(ex, "Error in service deleteprofile");
+                    throw;
+                }
+            }
         }
         #endregion
 
         #region[Skill]
-        public async Task<int> AddSkill(int userid,CandidateSkillRequest request)
+        public async Task<int> AddSkill(int userid, CandidateSkillRequest request)
         {
             try
             {
@@ -159,7 +209,7 @@ namespace JobPortalAPI.Services.Implementations
                 throw;
             }
         }
-        public async Task<int> AddEducation(int userid,CandidateEducationRequest request)
+        public async Task<int> AddEducation(int userid, CandidateEducationRequest request)
         {
             try
             {
@@ -186,7 +236,7 @@ namespace JobPortalAPI.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Service error in AddEducation");
-                throw ;
+                throw;
             }
         }
         public async Task<CandidateEducationResponse> UpdateEducation(int userId, CandidateEducationRequest request, int educationId)
@@ -210,12 +260,12 @@ namespace JobPortalAPI.Services.Implementations
             }
             catch (ArgumentException ex)
             {
-                _logger.LogWarning(ex, "Validation error in AddEducation");
+                _logger.LogWarning(ex, "Validation error in UpdateEducation");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Service error in AddEducation");
+                _logger.LogError(ex, "Service error in UpdateEducation");
                 throw;
             }
         }
@@ -240,7 +290,7 @@ namespace JobPortalAPI.Services.Implementations
         #endregion
 
         #region[Experience]
-        public async Task<int> AddExperience(int userid,CandidateExperienceRequest request)
+        public async Task<int> AddExperience(int userid, CandidateExperienceRequest request)
         {
             try
             {
@@ -269,7 +319,7 @@ namespace JobPortalAPI.Services.Implementations
                 throw;
             }
         }
-        
+
 
         public async Task<List<CandidateExperienceResponse>> GetExperience(int userId)
         {
@@ -285,7 +335,7 @@ namespace JobPortalAPI.Services.Implementations
             }
         }
 
-        public async Task<CandidateExperienceResponse> UpdateExperience(int userid, CandidateExperienceRequest request,int id)
+        public async Task<CandidateExperienceResponse> UpdateExperience(int userid, CandidateExperienceRequest request, int id)
         {
             try
             {
@@ -297,7 +347,7 @@ namespace JobPortalAPI.Services.Implementations
                 }
                 var updateexperience = new CandidateExperience
                 {
-                    Id=id,
+                    Id = id,
                     UserId = userid,
                     CompanyName = request.CompanyName,
                     Designation = request.Designation,
@@ -320,7 +370,7 @@ namespace JobPortalAPI.Services.Implementations
                 throw;
             }
         }
-        public async Task<bool> DeleteExperience(int experienceId,int userId)
+        public async Task<bool> DeleteExperience(int experienceId, int userId)
         {
             try
             {
