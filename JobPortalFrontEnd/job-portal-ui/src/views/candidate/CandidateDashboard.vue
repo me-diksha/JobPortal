@@ -5,10 +5,12 @@ import Sidebar from "@/components/common/SideBar.vue";
 import logo from "@/assets/JobPortal_logo.png";
 import  {GetCandidateProfileDetails}  from "@/composables/CandidateProfile/UseGetCandidateProfile";
 import type { CandidateProfile as CandidateProfileType } from "@/types/candidate";
+import { useAuthStore } from "@/stores/authStore";
 const router = useRouter();
 const candidateProfile = ref<CandidateProfileType | null>(null);
 const loading = ref(false);
 const error = ref("");
+const authStore= useAuthStore();
 const getCandidateProfile = async () => {
     try {
         loading.value = true;
@@ -40,7 +42,11 @@ const toggleProfile = () => {
     showProfileMenu.value = !showProfileMenu.value;
 };
 const handlelogout = () => {
+    authStore.logout();
 
+    showProfileMenu.value = false;
+
+    router.push("/login");
 }
 const candidateMenu = [
 

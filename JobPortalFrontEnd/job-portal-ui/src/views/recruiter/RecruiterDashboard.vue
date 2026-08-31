@@ -2,6 +2,10 @@
 import { ref } from "vue";
 import logo from "@/assets/JobPortal_logo.png"
 import Sidebar from "@/components/common/SideBar.vue";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "vue-router";
+const authStore = useAuthStore();
+const router = useRouter();
 const showProfileMenu = ref(false);
 
 const toggleProfile = () => {
@@ -9,12 +13,9 @@ const toggleProfile = () => {
 };
 
 const handleLogout = () => {
-    console.log("Recruiter Logout");
-    // remove token
-    localStorage.removeItem("token");
-
-    // redirect later
-    // router.push("/login");
+    authStore.logout();
+    showProfileMenu.value =false;
+    router.push("/login");
 };
 const recruiterMenu = [
   { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },

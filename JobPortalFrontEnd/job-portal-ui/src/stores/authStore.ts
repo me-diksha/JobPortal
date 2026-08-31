@@ -62,7 +62,11 @@ export const useAuthStore = defineStore(
             return true;
         });
 
-
+        const logout = () => {
+            sessionStorage.removeItem("accessToken");
+            accessToken.value = null;
+            actorType.value = null;
+        };
         const setToken = (token: string) => {
 
             accessToken.value = token;
@@ -103,30 +107,30 @@ export const useAuthStore = defineStore(
         }
         const restoreUserFromToken = () => {
 
-    if (!accessToken.value) {
-        return;
-    }
+            if (!accessToken.value) {
+                return;
+            }
 
-    const payload = parseToken(accessToken.value);
+            const payload = parseToken(accessToken.value);
 
-    if (!payload) {
-        return;
-    }
+            if (!payload) {
+                return;
+            }
 
-    userId.value =
-        payload.sub
-            ? Number(payload.sub)
-            : null;
+            userId.value =
+                payload.sub
+                    ? Number(payload.sub)
+                    : null;
 
-    actorType.value =
-        payload.actor_type ?? null;
+            actorType.value =
+                payload.actor_type ?? null;
 
-    email.value =
-        payload.email ?? null;
-};
+            email.value =
+                payload.email ?? null;
+        };
 
-restoreUserFromToken();
-        
+        restoreUserFromToken();
+
 
 
         return {
@@ -136,8 +140,9 @@ restoreUserFromToken();
             email,
             isAuthenticated,
             setToken,
-            clear
-            
+            clear,
+            logout
+
         };
     }
 );
