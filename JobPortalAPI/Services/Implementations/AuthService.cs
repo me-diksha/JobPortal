@@ -7,6 +7,7 @@ using JobPortalAPI.Models.Responses;
 using JobPortalAPI.Repositories.Abstractions;
 using JobPortalAPI.Services.Abstractions;
 using Microsoft.Win32;
+using System.ComponentModel.Design;
 
 namespace JobPortalAPI.Services.Implementations
 {
@@ -39,6 +40,15 @@ namespace JobPortalAPI.Services.Implementations
             {
                 return null;
             }
+            //validate company first
+            if (request.RoleId == (int)ActorType.Recruiter)
+            {
+                if (request.CompanyId == null &&
+                    string.IsNullOrWhiteSpace(request.CompanyName))
+                {
+                    return null;
+                }
+            }
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var user = new User
             {
@@ -51,7 +61,7 @@ namespace JobPortalAPI.Services.Implementations
             
             if (newUserId <= 0)
                 return null;
-            if (request.RoleId == 1)
+            if (request.RoleId == (int)ActorType.Candidate)
             {
                 var requestTocreateProfile = new CreateCandidateProfileRequest
                 {
@@ -65,17 +75,38 @@ namespace JobPortalAPI.Services.Implementations
                      requestTocreateProfile
                 );
             }
-            if(request.RoleId == 2)
-            {   
-                var createcompany = new Company
+            if(request.RoleId == (int)ActorType.Recruiter)
+            {
+                long companyId;
+                //var createcompany = new Company
+                //{
+                //    Name = request.CompanyName,
+                //    CreatedBy = newUserId
+                //};
+                //var companyid = await _companyService.CreateCompany(createcompany);
+                if (request.CompanyId.HasValue)
                 {
-                    Name = request.CompanyName,
-                    CreatedBy = newUserId
-                };
-                var companyid= await _companyService.CreateCompany(createcompany);
+                    // Existing company
+                    companyId = request.CompanyId.Value;
+                }
+                else if (!string.IsNullOrWhiteSpace(request.CompanyName))
+                {
+                    // New company
+                    var company = new Company
+                    {
+                        Name = request.CompanyName,
+                        CreatedBy = newUserId
+                    };
+
+                    companyId = await _companyService.CreateCompany(company);
+                }
+                else
+                {
+                    return null;
+                }
                 var requestToCreateProfile = new RecruiterProfileRequest
                 {
-                    CompanyId = companyid,
+                    CompanyId = request.CompanyId,
                     FirstName= request.FirstName,
                     LastName= request.LastName,
             

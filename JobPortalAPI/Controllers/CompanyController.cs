@@ -32,6 +32,7 @@ namespace JobPortalAPI.Controllers
         public async Task<IActionResult> CreateCompany(
             [FromBody] Company company)
         {
+            company.CreatedBy = UserId;
             var result =
                 await _companyService.CreateCompany(company);
 

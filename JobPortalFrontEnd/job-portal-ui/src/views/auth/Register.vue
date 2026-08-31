@@ -1,18 +1,30 @@
 <script setup lang="ts">
 
-import { ref } from "vue";
+import { ref, computed,onMounted } from "vue";
 import { useRouter } from "vue-router"
 import { useToast } from "vue-toastification"
 import {register} from "@/composables/Auth/UseRegister"
 import { useAuthStore } from "@/stores/authStore";
 import { roles } from "@/common/PermissionRoles";
 import { RoleId } from "@/common/PermissionRoles";
+import type { RegisterRequest } from "@/types/Register";
+import type { Company } from "@/types/company";
+import { GetAllCompanies } from "@/composables/Common/UseGetAllCompanies";
 const toast = useToast();
 const router = useRouter();
-
 const role = ref("candidate");
 
+const companies = ref<Company[]>([]);
 
+const selectedCompanyId = ref<number | null>(null);
+
+const companySearch = ref("");
+
+const showCompanyDropdown = ref(false);
+
+const showCompanyModal = ref(false);
+
+const newCompanyName = ref("");
 const form = ref({
 
     FirstName: "",
@@ -20,14 +32,91 @@ const form = ref({
     email: "",
     password: "",
     confirmPassword: "",
-    companyName: "",
     country: "",
    
 
 });
 
+const getCompanies = async () => {
 
+    try {
 
+        const response =
+            await GetAllCompanies();
+
+        companies.value = response.data;
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        toast.error("Unable to load companies");
+
+    }
+};
+
+onMounted(()=>{
+    getCompanies();
+})
+
+const filteredCompanies = computed(() => {
+
+    const search =
+        companySearch.value.trim().toLowerCase();
+
+    if (!search) {
+        return companies.value;
+    }
+
+    return companies.value.filter(company =>
+        company.name.toLowerCase().includes(search)
+    );
+
+});
+const selectCompany = (company: Company) => {
+
+    selectedCompanyId.value = company.id;
+
+    companySearch.value = company.name;
+
+    showCompanyDropdown.value = false;
+
+};
+const openCompanyModal = () => {
+
+    newCompanyName.value = "";
+
+    showCompanyDropdown.value = false;
+
+    showCompanyModal.value = true;
+
+};
+const closeCompanyModal = () => {
+
+    showCompanyModal.value = false;
+
+};
+const useNewCompany = () => {
+
+    if (!newCompanyName.value.trim()) {
+
+        toast.error("Company name is required");
+
+        return;
+
+    }
+
+    // Clear existing selection
+    selectedCompanyId.value = null;
+
+    // Store the new company name
+    companySearch.value =
+        newCompanyName.value.trim();
+
+    showCompanyModal.value = false;
+
+};
 const registerUser = async() => {
     const authStore = useAuthStore();
     console.log({
@@ -44,7 +133,6 @@ const registerUser = async() => {
         FirstName :form.value.FirstName,
         LastName :form.value.LastName,
         Country :form.value.country,
-        CompanyName:form.value.companyName,
         Email: form.value.email,
         Password :form.value.password,
         RoleId :roleId
@@ -181,7 +269,7 @@ const goToLogin = () => {
                     <div v-if="role === 'recruiter'">
 
 
-                        <input v-model="form.companyName" placeholder="Company Name" required />
+                        <!-- <input v-model="form.companyName" placeholder="Company Name" required /> -->
 
 
 
