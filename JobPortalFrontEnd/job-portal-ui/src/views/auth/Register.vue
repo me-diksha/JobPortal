@@ -6,6 +6,7 @@ import { useToast } from "vue-toastification"
 import {register} from "@/composables/Auth/UseRegister"
 import { useAuthStore } from "@/stores/authStore";
 import { roles } from "@/common/PermissionRoles";
+import { RoleId } from "@/common/PermissionRoles";
 const toast = useToast();
 const router = useRouter();
 
@@ -38,7 +39,7 @@ const registerUser = async() => {
         toast.error("Passwords do not match");
         return;
     }
-    const roleId = role.value === "candidate" ? roles.Candidate : roles.Recruiter;
+    const roleId = role.value === "candidate" ?  RoleId.Candidate: RoleId.Recruiter;
     var response = await register({
         FirstName :form.value.FirstName,
         LastName :form.value.LastName,

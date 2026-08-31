@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION get_recruiter
 (
-    p_userid bigint
+    p_userid int
 )
 RETURNS TABLE
 (
     id bigint,
-    userid bigint,
+    userid int,
     companyid bigint,
     firstname varchar,
     lastname varchar,

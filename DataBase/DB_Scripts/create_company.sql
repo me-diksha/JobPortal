@@ -42,7 +42,7 @@ BEGIN
         company_size,
         foundedyear,
         createdby,
-		createdate
+		createddate
     )
     VALUES
     (

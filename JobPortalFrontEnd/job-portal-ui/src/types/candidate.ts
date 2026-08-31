@@ -21,24 +21,24 @@ export interface CandidateProfile {
 }
 
 export interface CreateCandidateProfileRequest {
-    headline: string;
-    bio: string;
+    headline: string | null;
+    bio: string | null;
 
-    addressLine1: string;
-    addressLine2: string;
+    addressLine1: string | null;
+    addressLine2: string | null;
 
-    city: string;
-    state: string;
+    city: string | null;
+    state: string | null;
 
     country: string;
 
     currentSalary: number;
     expectedSalary: number;
 
-    resumeUrl: string;
+    resumeUrl: string | null;
 
     firstname: string;
-    lastName?: string;
+    lastName: string | null;
 }
 
 export interface CandidateSkill {
@@ -52,34 +52,34 @@ export interface CandidateSkillRequest {
     experienceYears: number;
 }
 
-export interface CandidateEducation{
+export interface CandidateEducation {
     id: number;
-    instituteName : string;
-    degree : string;
-    fieldOfStudy? : string | null;
-    startYear : number;
-    endYear : number;
-    percentage : number;
+    instituteName: string;
+    degree: string;
+    fieldOfStudy?: string | null;
+    startYear: number;
+    endYear: number;
+    percentage: number;
 }
 
-export interface CandidateExperience{
+export interface CandidateExperience {
     id: number;
     companyName: string;
     designation: string;
     startDate: string;
-    endDate? : string;
+    endDate?: string;
     currentlyWorking: boolean;
-    description? : string;
+    description?: string;
 }
 
-export interface CandidateExperienceRequest{
-    
+export interface CandidateExperienceRequest {
+
     companyName: string;
     designation: string;
     startDate: string;
-    endDate? : string;
+    endDate?: string;
     currentlyWorking: boolean;
-    description? : string;
+    description?: string;
 
 }
 

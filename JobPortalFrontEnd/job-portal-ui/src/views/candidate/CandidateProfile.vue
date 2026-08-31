@@ -3,14 +3,14 @@
 import { ref, onMounted } from "vue";
 import Sidebar from "@/components/common/SideBar.vue";
 import logo from "@/assets/JobPortal_logo.png";
-import ProfileHeader from "@/components/candidateProfile/ProfileHeader.vue";
+import ProfileHeader from "@/components/common/ProfileHeader.vue";
 import type { CandidateProfile as CandidateProfileType } from "@/types/candidate";
 import AboutCard from "@/components/candidateProfile/AboutCard.vue";
 import SkillsCard from "@/components/candidateProfile/SkillsCard.vue";
 import type { CandidateSkill } from "@/types/candidate";
 import EducationCard from "@/components/candidateProfile/EducationCard.vue";
-import type { CandidateEducation as CandidateEducationType} from "@/types/candidate";
-import type { CandidateExperience as CandidateExperienceType} from "@/types/candidate";
+import type { CandidateEducation as CandidateEducationType } from "@/types/candidate";
+import type { CandidateExperience as CandidateExperienceType } from "@/types/candidate";
 import ExperienceCard from "@/components/candidateProfile/ExperienceCard.vue";
 import { GetCandidateProfileDetails } from "@/composables/CandidateProfile/UseGetCandidateProfile";
 import { GetCandidateSkills } from "@/composables/CandidateSkills/UseGetCandidateSkill";
@@ -20,10 +20,10 @@ import { GetCandidateExperience } from "@/composables/CandidateExperience/UseGet
 const isEdit = ref(false);
 const loading = ref(false);
 const error = ref("");
-const candidateProfile = ref<CandidateProfileType|null >(null);
-const candidateSkills = ref<CandidateSkill[] >([]);
-const candidateEducation = ref<CandidateEducationType[] >([]);
-const candidateExperienence = ref<CandidateExperienceType[] >([]);
+const candidateProfile = ref<CandidateProfileType | null>(null);
+const candidateSkills = ref<CandidateSkill[]>([]);
+const candidateEducation = ref<CandidateEducationType[]>([]);
+const candidateExperienence = ref<CandidateExperienceType[]>([]);
 const candidateMenu = [
 
     {
@@ -84,7 +84,7 @@ const loadprofiledetails = async () => {
     }
 }
 onMounted(() => {
- loadprofiledetails();
+    loadprofiledetails();
 })
 const handleEducationEdit = (updatedEducation: CandidateEducationType) => {
     const index = candidateEducation.value.findIndex(
@@ -106,7 +106,7 @@ const handleEducationAdd = (newEducation: CandidateEducationType) => {
 };
 const handleExperienceEdit = (updatedExperience: CandidateExperienceType) => {
     const index = candidateExperienence.value.findIndex(exp => exp.id === updatedExperience.id);
-    if(index !== -1){
+    if (index !== -1) {
         candidateExperienence.value[index] = updatedExperience
     }
 };
@@ -116,11 +116,11 @@ const handleExperienceDelete = (id: number) => {
         experience => experience.id !== id
     );
 };
-const handleExperienceAdd = async(newExperience:CandidateExperienceType)=>{
+const handleExperienceAdd = async (newExperience: CandidateExperienceType) => {
     candidateExperienence.value.push(newExperience);
 }
-const handleSkillAdded = async() => {
-    const updatedSkills = await  GetCandidateSkills();
+const handleSkillAdded = async () => {
+    const updatedSkills = await GetCandidateSkills();
     candidateSkills.value = updatedSkills.data ?? [];
 
 };
@@ -181,20 +181,26 @@ const saveProfile = () => {
             <div class="profile-page">
 
 
-                <ProfileHeader  v-if="candidateProfile":profile="candidateProfile":is-editing="isEdit"@edit="editProfile" />
+                <ProfileHeader v-if="candidateProfile" :first-name="candidateProfile.firstname"
+                    :last-name="candidateProfile.lastName" :subtitle="candidateProfile.headline"
+                    :location="`${candidateProfile.city ?? ''}, ${candidateProfile.state ?? ''}, ${candidateProfile.country ?? ''}`"
+                    :is-editing="isEdit" @edit="editProfile" />
 
 
-                <AboutCard v-if="candidateProfile":profile="candidateProfile":is-editing="isEdit"@update="updateProfile" />
+                <AboutCard v-if="candidateProfile" :profile="candidateProfile" :is-editing="isEdit"
+                    @update="updateProfile" />
 
 
-                <SkillsCard :skills="candidateSkills":is-editing="isEdit"@added ="handleSkillAdded"@delete="handleSkillDelete" />
+                <SkillsCard :skills="candidateSkills" :is-editing="isEdit" @added="handleSkillAdded"
+                    @delete="handleSkillDelete" />
 
 
-                <EducationCard :educations="candidateEducation":is-editing="isEdit"@added ="handleEducationAdd"@edit="handleEducationEdit"@delete="handleEducationDelete" />
+                <EducationCard :educations="candidateEducation" :is-editing="isEdit" @added="handleEducationAdd"
+                    @edit="handleEducationEdit" @delete="handleEducationDelete" />
 
 
-                <ExperienceCard :experiences="candidateExperienence":is-editing="isEdit"@edit=" handleExperienceEdit"@added ="handleExperienceAdd"
-                    @delete="handleExperienceDelete" />
+                <ExperienceCard :experiences="candidateExperienence" :is-editing="isEdit" @edit="handleExperienceEdit"
+                    @added="handleExperienceAdd" @delete="handleExperienceDelete" />
 
 
             </div>

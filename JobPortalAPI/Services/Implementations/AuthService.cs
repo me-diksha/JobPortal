@@ -69,7 +69,8 @@ namespace JobPortalAPI.Services.Implementations
             {   
                 var createcompany = new Company
                 {
-                    Name = request.CompanyName
+                    Name = request.CompanyName,
+                    CreatedBy = newUserId
                 };
                 var companyid= await _companyService.CreateCompany(createcompany);
                 var requestToCreateProfile = new RecruiterProfileRequest

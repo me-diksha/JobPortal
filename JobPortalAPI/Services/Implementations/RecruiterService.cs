@@ -74,7 +74,7 @@ namespace JobPortalAPI.Services.Implementations
                     return null;
 
 
-                var response= _recruiterRepository.GetProfile(userId);
+                var response=  await _recruiterRepository.GetProfile(userId);
                 return _mapper.Map<RecruiterProfileResponse>(response);
             }
             catch (Exception ex)

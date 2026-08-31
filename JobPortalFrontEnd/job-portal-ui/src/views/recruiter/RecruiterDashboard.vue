@@ -17,6 +17,9 @@ const handleLogout = () => {
     showProfileMenu.value =false;
     router.push("/login");
 };
+const gotoProfile =()=>{
+    router.push('/recruiterProfile');
+}
 const recruiterMenu = [
   { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
   { name: "Company Profile", icon: "🏢", path: "/company" },
@@ -47,77 +50,7 @@ const bottomMenu = [
         :logo="logo"
         :menuItems="recruiterMenu"
         :bottomMenu="bottomMenu"
-/>
-        <!-- <aside class="sidebar">
-
-
-            <div class="brand">
-
-                <img src="@/assets/JobPortal_logo.png" class="logo-img" />
-
-                <div class="brand-text">
-                    <h2 class="company">Jobsy</h2>
-                    <p class="slogan">Hire The Best</p>
-                </div>
-
-            </div>
-
-
-
-            <div class="menu-item active">
-                🏠 Dashboard
-            </div>
-
-
-            <div class="menu-item">
-                🏢 Company Profile
-            </div>
-
-
-            <div class="menu-item">
-                📢 Post Job
-            </div>
-
-
-            <div class="menu-item">
-                💼 Manage Jobs
-            </div>
-
-
-            <div class="menu-item">
-                👥 Candidates
-            </div>
-
-
-            <div class="menu-item">
-                ⭐ Shortlisted
-            </div>
-
-
-            <div class="menu-item">
-                📅 Interviews
-            </div>
-
-
-            <div class="bottom-menu">
-
-
-                <div>
-                    ⚙ Settings
-                </div>
-
-
-                <div>
-                    💬 Help Center
-                </div>
-
-
-            </div>
-
-
-        </aside> -->
-
-
+    />
 
         <!-- Main -->
 
@@ -162,7 +95,7 @@ const bottomMenu = [
                     <div v-if="showProfileMenu" class="dropdown-menu">
 
 
-                        <div>
+                        <div @click ="gotoProfile">
                             Edit Profile
                         </div>
 
