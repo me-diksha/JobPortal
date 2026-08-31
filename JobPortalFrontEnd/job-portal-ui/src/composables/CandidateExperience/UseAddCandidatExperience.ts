@@ -2,5 +2,6 @@ import api from "@/api/axios";
 import type { CandidateExperienceRequest } from "@/types/candidate";
 
 export const AddCandidateExperience = async (payload :CandidateExperienceRequest) => {
-    return await api.post("/candidate/addexperience",payload);
+    const response = await api.post("/candidate/addexperience",payload);
+    return response.data;
 };

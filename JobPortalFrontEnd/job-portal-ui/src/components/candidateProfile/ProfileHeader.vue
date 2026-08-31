@@ -85,7 +85,7 @@ const emit = defineEmits<{
         @click="emit('edit')"
     >
 
-    {{ isEditing ? "Done Editing" : "Edit Profile" }}
+    {{ isEditing ? "Save Changes" : "Edit Profile" }}
     </button>
 
 </div>

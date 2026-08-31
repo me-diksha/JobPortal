@@ -5,14 +5,15 @@ import { ref } from "vue";
 import { DeleteCandidateEducation } from "@/composables/CandidateEducation/UseDeleteCandidateEducation";
 import { AddCandidateEducation } from "@/composables/CandidateEducation/UseAddCandidateEducation";
 import { UpdateCandidateEducation } from "@/composables/CandidateEducation/UseUpdateCandidateEducation";
-defineProps<{
+const props = defineProps<{
     educations: CandidateEducation[];
+    isEditing :boolean;
 }>();
 
 const emit = defineEmits<{
     edit: [education: CandidateEducation];
     delete: [id: number];
-    added: [];
+    added: [education: CandidateEducation];
 }>();
 //to add 
 const isAdding = ref(false);
@@ -74,7 +75,6 @@ const editEducation = (education: CandidateEducation) => {
 // to save add/edit
 const saveEducation = async () => {
 
-    // Clear previous errors
     errors.value = {
         instituteName: "",
         degree: "",
@@ -110,7 +110,6 @@ const saveEducation = async () => {
         isValid = false;
     }
 
-    // Don't call API if validation failed
     if (!isValid) {
         return;
     }
@@ -125,21 +124,35 @@ const saveEducation = async () => {
                 ? newEducation.value.fieldOfStudy.trim()
                 : null
         };
+
         // UPDATE
         if (isEditing.value && editingEducationId.value !== null) {
 
-            await UpdateCandidateEducation(
+            const response = await UpdateCandidateEducation(
                 editingEducationId.value,
                 payload
             );
 
+            const updatedEducation: CandidateEducation = {
+                id: editingEducationId.value,
+                ...payload
+            };
+
+            emit("edit", updatedEducation);
+
         }
+
         // ADD
         else {
 
-            await AddCandidateEducation(
-                payload
-            );
+            const newId = await AddCandidateEducation(payload);
+
+            const newEducation: CandidateEducation = {
+                id: newId,
+                ...payload
+            };
+
+            emit("added", newEducation);
         }
 
         // Close form
@@ -147,17 +160,13 @@ const saveEducation = async () => {
         isEditing.value = false;
         editingEducationId.value = null;
 
-        // Tell parent to refresh education list
-        emit("added");
-
     } catch (error) {
 
-        console.error("Error adding education:", error);
+        console.error("Error saving education:", error);
 
     } finally {
 
         isSaving.value = false;
-
     }
 };
 
@@ -189,7 +198,7 @@ const deleteEducation = async (id: number) => {
 
             <h2>Education</h2>
 
-            <button v-if="!isAdding" class="add-btn" @click="startAdd">
+            <button v-if="props.isEditing && !isAdding" class="add-btn" @click="startAdd">
                 + Add Education
             </button>
 

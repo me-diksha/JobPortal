@@ -86,8 +86,14 @@ const loadprofiledetails = async () => {
 onMounted(() => {
  loadprofiledetails();
 })
-const handleEducationEdit = (education: CandidateEducationType) => {
-    console.log("Edit:", education);
+const handleEducationEdit = (updatedEducation: CandidateEducationType) => {
+    const index = candidateEducation.value.findIndex(
+        education => education.id === updatedEducation.id
+    );
+
+    if (index !== -1) {
+        candidateEducation.value[index] = updatedEducation;
+    }
 };
 
 const handleEducationDelete = (id: number) => {
@@ -95,12 +101,14 @@ const handleEducationDelete = (id: number) => {
         education => education.id !== id
     );
 };
-const handleEducationAdd = async()=>{
-        const responseEducation = await GetCandidateEducation();
-        candidateEducation.value = responseEducation.data ?? [];
-}
-const handleExperienceEdit = (experience: CandidateExperienceType) => {
-    console.log("Edit:", experience);
+const handleEducationAdd = (newEducation: CandidateEducationType) => {
+    candidateEducation.value.push(newEducation);
+};
+const handleExperienceEdit = (updatedExperience: CandidateExperienceType) => {
+    const index = candidateExperienence.value.findIndex(exp => exp.id === updatedExperience.id);
+    if(index !== -1){
+        candidateExperienence.value[index] = updatedExperience
+    }
 };
 
 const handleExperienceDelete = (id: number) => {
@@ -108,9 +116,8 @@ const handleExperienceDelete = (id: number) => {
         experience => experience.id !== id
     );
 };
-const handleExperienceAdd = async()=>{
-    const responseExperience = await GetCandidateExperience();
-    candidateExperienence.value = responseExperience.data ?? [];
+const handleExperienceAdd = async(newExperience:CandidateExperienceType)=>{
+    candidateExperienence.value.push(newExperience);
 }
 const handleSkillAdded = async() => {
     const updatedSkills = await  GetCandidateSkills();
@@ -160,33 +167,33 @@ const saveProfile = () => {
         <section class="main">
 
 
-            <header class="topbar">
+            <!-- <header class="topbar">
 
                 <h2>
-                    Candidate Profile
+                    My Profile
                 </h2>
 
 
-            </header>
+            </header> -->
 
 
 
             <div class="profile-page">
 
 
-                <ProfileHeader  v-if="candidateProfile":profile="candidateProfile" @edit="editProfile" />
+                <ProfileHeader  v-if="candidateProfile":profile="candidateProfile":is-editing="isEdit"@edit="editProfile" />
 
 
-                <AboutCard v-if="candidateProfile":profile="candidateProfile" @update="updateProfile" />
+                <AboutCard v-if="candidateProfile":profile="candidateProfile":is-editing="isEdit"@update="updateProfile" />
 
 
-                <SkillsCard :skills="candidateSkills" @added ="handleSkillAdded" @delete="handleSkillDelete" />
+                <SkillsCard :skills="candidateSkills":is-editing="isEdit"@added ="handleSkillAdded"@delete="handleSkillDelete" />
 
 
-                <EducationCard :educations="candidateEducation" @added ="handleEducationAdd" @edit="handleEducationEdit" @delete="handleEducationDelete" />
+                <EducationCard :educations="candidateEducation":is-editing="isEdit"@added ="handleEducationAdd"@edit="handleEducationEdit"@delete="handleEducationDelete" />
 
 
-                <ExperienceCard :experiences="candidateExperienence" @edit=" handleExperienceEdit" @added ="handleExperienceAdd"
+                <ExperienceCard :experiences="candidateExperienence":is-editing="isEdit"@edit=" handleExperienceEdit"@added ="handleExperienceAdd"
                     @delete="handleExperienceDelete" />
 
 

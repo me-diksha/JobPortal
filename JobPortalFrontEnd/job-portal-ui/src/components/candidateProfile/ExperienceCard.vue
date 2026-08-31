@@ -7,14 +7,15 @@ import { ref } from "vue";
 import { AddCandidateExperience } from "@/composables/CandidateExperience/UseAddCandidatExperience";
 import { DeleteCandidateExperience } from "@/composables/CandidateExperience/UseDeleteCandidateExperience";
 import { UpdateCandidateExperience } from "@/composables/CandidateExperience/UseUpdateCandidateExperience";
-defineProps<{
+const props = defineProps<{
     experiences: CandidateExperience[];
+    isEditing: boolean;
 }>();
 
 const emit = defineEmits<{
     edit: [experience: CandidateExperience];
     delete: [id: number];
-    added: [];
+    added: [experience :CandidateExperience];
 }>();
 
 // --------------------
@@ -198,15 +199,27 @@ const saveExperience = async () => {
                 editingExperienceId.value,
                 payload
             );
+            const updatedExp: CandidateExperience = {
+                id: editingExperienceId.value,
+                ...payload
+            };
+
+            emit("edit", updatedExp);
 
         }
 
         // ADD
         else {
 
-            await AddCandidateExperience(
+            const newId =await AddCandidateExperience(
                 payload
             );
+            const newExp: CandidateExperience = {
+                id: newId,
+                ...payload
+            };
+
+            emit("added",newExp);
         }
 
         // Close form
@@ -215,7 +228,7 @@ const saveExperience = async () => {
         editingExperienceId.value = null;
 
         // Tell parent to refresh experience list
-        emit("added");
+        
 
     } catch (error) {
 
@@ -266,7 +279,7 @@ const deleteExperience = async (id: number) => {
             <h2>Experience</h2>
 
             <button
-                v-if="!isAdding"
+                v-if="props.isEditing && !isAdding"
                 class="add-btn"
                 @click="startAdd"
             >

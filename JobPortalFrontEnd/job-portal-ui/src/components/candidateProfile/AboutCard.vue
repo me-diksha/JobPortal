@@ -7,7 +7,8 @@ import { UpdateCandidateProfile } from "@/composables/CandidateProfile/UseUpdate
 
 
 const props = defineProps<{
-    profile: CandidateProfile
+    profile: CandidateProfile;
+    isEditing : boolean;
 }>();
 
 
@@ -16,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 
-const isEditing = ref(false);
+const isEditingAbout = ref(false);
 
 const errors = ref({
     firstname: "",
@@ -102,7 +103,7 @@ const startEdit = () => {
 
     loadEditData();
 
-    isEditing.value = true;
+    isEditingAbout.value = true;
 
 };
 
@@ -113,7 +114,7 @@ const startEdit = () => {
 
 const cancelEdit = () => {
 
-    isEditing.value = false;
+    isEditingAbout.value = false;
 
 };
 
@@ -190,7 +191,7 @@ const saveChanges = async () => {
             ...payload
         });
 
-        isEditing.value = false;
+        isEditingAbout.value = false;
 
         console.log(
             "Profile updated successfully:",
@@ -215,7 +216,7 @@ watch(
     () => props.profile,
     () => {
 
-        if (!isEditing.value) {
+        if (!isEditingAbout.value) {
 
             loadEditData();
 
@@ -243,7 +244,7 @@ watch(
 
 
         <button
-            v-if="!isEditing"
+            v-if=" props.isEditing && !isEditingAbout "
             class="add-btn"
             @click="startEdit"
         >
@@ -260,7 +261,7 @@ watch(
          VIEW MODE
     ========================== -->
 
-    <div v-if="!isEditing">
+    <div v-if="!isEditingAbout">
 
 
         <!-- BIO -->

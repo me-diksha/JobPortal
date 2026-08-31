@@ -7,7 +7,8 @@ import type { Skills } from "@/types/Skills";
 import { AddCandidateSkills } from "@/composables/CandidateSkills/UseAddCandidateSkill";
 import { DeleteCandidateSkill } from "@/composables/CandidateSkills/UseDeletecandidateskill";
 const props = defineProps<{
-    skills: CandidateSkill[]
+    skills: CandidateSkill[];
+    isEditing: boolean;
 }>();
 
 
@@ -261,7 +262,7 @@ const  deleteSkill = async(id: number) => {
 
 
         <button
-            v-if="!isAdding"
+            v-if="props.isEditing && !isAdding"
             class="add-btn"
             @click="startAdd"
         >
