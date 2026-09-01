@@ -5,7 +5,6 @@ defineProps<{
     lastName: string |null;
     subtitle?: string | null;
     location?: string | null;
-    isEditing: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -48,18 +47,6 @@ const emit = defineEmits<{
             </p>
 
         </div>
-
-
-        <!-- Edit Button -->
-
-        <button
-            class="edit-profile-btn"
-            @click="emit('edit')"
-        >
-
-            {{ isEditing ? "Save Changes" : "Edit Profile" }}
-
-        </button>
 
     </div>
 

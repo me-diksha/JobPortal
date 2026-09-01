@@ -10,6 +10,7 @@ export interface RecruiterProfile {
     department: string | null;
     phone: string | null;
     linkedinUrl: string | null;
+    companyName: string | null;
 }
 
 export interface RecruiterProfileRequest {

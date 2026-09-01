@@ -106,7 +106,7 @@ namespace JobPortalAPI.Services.Implementations
                 }
                 var requestToCreateProfile = new RecruiterProfileRequest
                 {
-                    CompanyId = request.CompanyId,
+                    CompanyId = companyId,
                     FirstName= request.FirstName,
                     LastName= request.LastName,
             

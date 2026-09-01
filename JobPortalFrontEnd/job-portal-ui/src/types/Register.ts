@@ -1,7 +1,7 @@
 export interface RegisterRequest {
     FirstName: string;
     LastName: string;
-    Country?: string;
+    Country?: string | null;
 
     CompanyId?: number | null;
     CompanyName?: string | null;

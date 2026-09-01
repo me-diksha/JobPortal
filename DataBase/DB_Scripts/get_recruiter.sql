@@ -1,22 +1,8 @@
-CREATE OR REPLACE FUNCTION get_recruiter
-(
-    p_userid int
-)
-RETURNS TABLE
-(
-    id bigint,
-    userid int,
-    companyid bigint,
-    firstname varchar,
-    lastname varchar,
-    designation varchar,
-    department varchar,
-    phone varchar,
-    linkedinurl varchar
-)
-LANGUAGE plpgsql
-AS
-$$
+
+CREATE OR REPLACE FUNCTION public.get_recruiter(p_userid integer)
+ RETURNS TABLE(id bigint, userid integer, companyid bigint, firstname character varying, lastname character varying, designation character varying, department character varying, phone character varying, linkedinurl character varying, companyname character varying)
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
 
 RETURN QUERY
@@ -30,10 +16,13 @@ r.lastname,
 r.designation,
 r.department,
 r.phone,
-r.linkedinurl
+r.linkedinurl,
+c.name
 FROM recruiter r
+left join company c on c.id = r.companyid
 WHERE r.userid=p_userid
 AND r.isdeleted=0;
 
 END;
-$$;
+$function$
+;

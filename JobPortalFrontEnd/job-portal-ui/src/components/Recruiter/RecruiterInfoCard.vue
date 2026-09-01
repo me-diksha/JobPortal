@@ -11,7 +11,6 @@ import { UpdateRecruiterProfile } from "@/composables/Recruiter/RecruiterProfile
 
 const props = defineProps<{
     profile: RecruiterProfile;
-    isEditing: boolean;
 }>();
 
 
@@ -236,7 +235,7 @@ watch(
         </h2>
 
         <button
-            v-if="props.isEditing && !isEditingInfo"
+            v-if="!isEditingInfo"
             class="edit-btn"
             @click="startEdit"
         >
@@ -252,6 +251,17 @@ watch(
 
     <div v-if="!isEditingInfo">
 
+        <div class="company">
+
+                <label>
+                    Company
+                </label>
+
+                <p>
+                    {{ profile.companyName || "Not added" }}
+                </p>
+
+            </div>
         <div class="info-grid">
 
 
@@ -513,7 +523,19 @@ watch(
 
 }
 
+label {
 
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #6b7280;
+
+    margin-bottom: 7px;
+
+}
 .section-header {
 
     display: flex;
@@ -720,5 +742,6 @@ watch(
     }
 
 }
+
 
 </style>

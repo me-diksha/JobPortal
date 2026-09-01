@@ -35,12 +35,6 @@ const recruiterMenu = [
     },
 
     {
-        name: "My Profile",
-        icon: "👤",
-        path: "/recruiterProfile"
-    },
-
-    {
         name: "Company Profile",
         icon: "🏢",
         path: "/company"
@@ -221,14 +215,12 @@ const updateProfile = (
                     :first-name="recruiterProfile.firstName"
                     :last-name="recruiterProfile.lastName"
                     :subtitle="recruiterProfile.designation"
-                    :is-editing="isEdit"
                     @edit="editProfile"
                 />
 
 
                 <RecruiterInfoCard
                     :profile="recruiterProfile"
-                    :is-editing="isEdit"
                     @update="updateProfile"
                 />
 

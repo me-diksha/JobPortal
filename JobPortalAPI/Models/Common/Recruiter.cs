@@ -19,5 +19,6 @@
         public string? Phone { get; set; }
 
         public string? LinkedinUrl { get; set; }
+        public string ? CompanyName { get; set; }
     }
 }
