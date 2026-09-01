@@ -14,8 +14,9 @@ import type { RecruiterProfile as RecruiterProfileType }
     from "@/types/recruiter";
 
 import { GetRecruiterProfile } from "@/composables/Recruiter/RecruiterProfile/UseRecruiterGetProfile";
+import { useCompanyStore } from "@/stores/companyStore";
 
-
+const companyStore =useCompanyStore(); //tostore company id so can be used by company.vue
 const isEdit = ref(false);
 
 const loading = ref(false);
@@ -106,7 +107,9 @@ const loadProfile = async () => {
 
         recruiterProfile.value =
             response.data;
-
+        if (response.data.companyId){
+        companyStore.setCompanyId(response.data.companyId);
+        }
         console.log(
             "Recruiter Profile:",
             response.data

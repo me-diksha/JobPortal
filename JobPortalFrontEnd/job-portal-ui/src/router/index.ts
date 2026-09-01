@@ -7,6 +7,7 @@ import CandidateProfile from "@/views/candidate/CandidateProfile.vue";
 import { useAuthStore } from '@/stores/authStore.ts';
 import { roles } from '@/common/PermissionRoles.ts';
 import RecruiterProfile from '@/views/recruiter/RecruiterProfile.vue';
+import Company from '@/views/Company/Company.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,9 @@ const router = createRouter({
         requiresAuth: true,
         role: roles.Recruiter
       }
+    }, {
+      path: "/company",
+      component: Company
     }
   ],
 })
