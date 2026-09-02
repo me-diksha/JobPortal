@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import logo from "@/assets/JobPortal_logo.png"
 import Sidebar from "@/components/common/SideBar.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "vue-router";
+import { loadRecruiterContext } from "@/composables/Recruiter/useRecruiterContext";
+
 const authStore = useAuthStore();
 const router = useRouter();
 const showProfileMenu = ref(false);
@@ -35,6 +37,10 @@ const bottomMenu = [
   { name: "Help Center", icon: "💬" }
 ];
 
+
+onMounted(async () => {
+    await loadRecruiterContext();
+});
 </script>
 
 
