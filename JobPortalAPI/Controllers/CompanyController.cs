@@ -94,6 +94,7 @@ namespace JobPortalAPI.Controllers
         public async Task<IActionResult> UpdateCompany(
             [FromBody] Company company)
         {
+            company.UpdatedBy = UserId;
             var result =
                 await _companyService.UpdateCompany(company);
 

@@ -10,7 +10,7 @@ namespace JobPortalAPI.Repositories.Abstractions
 
         Task<IEnumerable<Company>> GetAllCompanies();
 
-        Task<long> UpdateCompany(Company company);
+        Task<Company> UpdateCompany(Company company);
 
         Task<bool> DeleteCompany(long id, long updatedBy);
     }

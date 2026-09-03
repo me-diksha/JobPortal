@@ -29,7 +29,7 @@ updatedat=NOW()
 
 WHERE userid=p_userid;
 
-RETURN p_userid;
+RETURN recruiter.id;
 
 END;
 $$;

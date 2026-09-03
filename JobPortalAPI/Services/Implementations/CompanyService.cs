@@ -69,7 +69,7 @@ namespace JobPortalAPI.Services
 
 
 
-        public async Task<long> UpdateCompany(Company company)
+        public async Task<Company> UpdateCompany(Company company)
         {
             try
             {

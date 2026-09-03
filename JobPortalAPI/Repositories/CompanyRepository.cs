@@ -2,6 +2,9 @@
 using JobPortalAPI.DataBaseAccess.Abstractions;
 using JobPortalAPI.Models.Common;
 using JobPortalAPI.Repositories.Abstractions;
+using System.ComponentModel.Design;
+using System.Diagnostics.Metrics;
+using System.Xml.Linq;
 
 namespace JobPortalAPI.Repositories
 {
@@ -117,19 +120,30 @@ namespace JobPortalAPI.Repositories
 
 
 
-        public async Task<long> UpdateCompany(Company company)
+        public async Task<Company>UpdateCompany(Company company)
         {
             try
             {
                 const string sql = @"
                 SELECT update_company
                 (
-                    @Id,
-                    @Name,
-                    @Description,
-                    @Industry,
-                    @Website,
-                    @UpdatedBy
+                            @Name,
+                            @Description,
+                            @Industry,
+                            @Website,
+                            @Email,
+                            @Phone,
+                            @Addressline1,
+                            @Addressline2,
+                            @City,
+                            @State,
+                            @Country,
+                            @Postalcode,
+                            @Logosurl,
+                            @CompanySize,
+                            @FoundedYear,
+                            @UpdatedBy,
+                            @CompanyId
                 );";
 
 
@@ -137,9 +151,27 @@ namespace JobPortalAPI.Repositories
                     _dbAccess.CreateConnection();
 
 
-                return await connection.ExecuteScalarAsync<long>(
+                return await connection.QuerySingleAsync<Company>(
                     sql,
-                    company);
+                    new {
+                        Name=company.Name,
+                        Description=company.Description,
+                        Industry=company.Industry,
+                        Website=company.Website,
+                        Email=company.Email,
+                        Phone=company.Phone,
+                        Addressline1=company.AddressLine1,
+                        Addressline2=company.AddressLine2,
+                        City=company.City,
+                        State=company.State,
+                        Country=company.Country,
+                        Postalcode=company.PostalCode,
+                        Logosurl=company.LogosUrl,
+                        CompanySize=company.CompanySize,
+                        FoundedYear=company.FoundedYear,
+                        UpdatedBy=company.UpdatedBy,
+                        CompanyId=company.Id
+                    });
             }
             catch (Exception ex)
             {
