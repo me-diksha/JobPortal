@@ -7,5 +7,6 @@ namespace JobPortalAPI.Services.Abstractions
     public interface ICommonService
     {
         Task<IEnumerable<Skills>> GetAllSkills();
+        Task<IEnumerable<EmploymentType>> GetAllEmploymentType();
     }
 }

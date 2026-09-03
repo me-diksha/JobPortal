@@ -5,5 +5,6 @@ namespace JobPortalAPI.Repositories.Abstractions
     public interface ICommonRepository
     {
         Task<IEnumerable<Skills>> GetAllSkills();
+        Task<IEnumerable<EmploymentType>> GetAllEmploymentType();
     }
 }

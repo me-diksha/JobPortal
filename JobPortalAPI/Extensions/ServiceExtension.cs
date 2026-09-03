@@ -14,13 +14,14 @@ namespace JobPortalAPI.Extensions
 
 
             services.AddScoped<ICandidateService, CandidateService>();
-            services.AddScoped<ICandidateRepository,CandidateRepository>();
+           
             services.AddScoped<IRecruiterService, RecruiterService>();
-            services.AddScoped<IRecruiterRepository, RecruiterRepository>();
+            
             services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<ICompanyRepository, CompanyRepository>();
+            
             services.AddScoped<ICommonService, CommonService>();
-            services.AddScoped<ICommonRepository, CommonRepository>();
+            services.AddScoped<IJobService, JobService>();
+            
             return services;
         }
     }

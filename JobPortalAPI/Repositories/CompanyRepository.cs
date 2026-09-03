@@ -10,16 +10,16 @@ namespace JobPortalAPI.Repositories
 {
     public class CompanyRepository : ICompanyRepository
     {
-        private readonly IDbAccess _dbAccess;
+
         private readonly ILogger<CompanyRepository> _logger;
+        private readonly IDbExecutor _dbExecutor;
 
 
-        public CompanyRepository(
-            IDbAccess dbAccess,
-            ILogger<CompanyRepository> logger)
+        public CompanyRepository(ILogger<CompanyRepository> logger, IDbExecutor dbExecutor)
         {
-            _dbAccess = dbAccess;
+
             _logger = logger;
+            _dbExecutor = dbExecutor;
         }
 
 
@@ -50,11 +50,8 @@ namespace JobPortalAPI.Repositories
                 );";
 
 
-                using var connection =
-                    _dbAccess.CreateConnection();
 
-
-                return await connection.ExecuteScalarAsync<long>(
+                return await _dbExecutor.ExecuteScalarAsync<long>(
                     sql,
                     company);
             }
@@ -76,11 +73,7 @@ namespace JobPortalAPI.Repositories
                     "SELECT * FROM get_company(@Id);";
 
 
-                using var connection =
-                    _dbAccess.CreateConnection();
-
-
-                return await connection.QueryFirstOrDefaultAsync<Company>(
+                return await _dbExecutor.QueryFirstOrDefaultAsync<Company>(
                     sql,
                     new { Id = id });
             }
@@ -103,11 +96,7 @@ namespace JobPortalAPI.Repositories
                     "SELECT * FROM get_all_companies();";
 
 
-                using var connection =
-                    _dbAccess.CreateConnection();
-
-
-                return await connection.QueryAsync<Company>(sql);
+                return await _dbExecutor.QueryAsync<Company>(sql);
             }
             catch (Exception ex)
             {
@@ -120,7 +109,7 @@ namespace JobPortalAPI.Repositories
 
 
 
-        public async Task<Company>UpdateCompany(Company company)
+        public async Task<Company> UpdateCompany(Company company)
         {
             try
             {
@@ -147,30 +136,28 @@ namespace JobPortalAPI.Repositories
                 );";
 
 
-                using var connection =
-                    _dbAccess.CreateConnection();
 
-
-                return await connection.QuerySingleAsync<Company>(
+                return await _dbExecutor.QuerySingleAsync<Company>(
                     sql,
-                    new {
-                        Name=company.Name,
-                        Description=company.Description,
-                        Industry=company.Industry,
-                        Website=company.Website,
-                        Email=company.Email,
-                        Phone=company.Phone,
-                        Addressline1=company.AddressLine1,
-                        Addressline2=company.AddressLine2,
-                        City=company.City,
-                        State=company.State,
-                        Country=company.Country,
-                        Postalcode=company.PostalCode,
-                        Logosurl=company.LogosUrl,
-                        CompanySize=company.CompanySize,
-                        FoundedYear=company.FoundedYear,
-                        UpdatedBy=company.UpdatedBy,
-                        CompanyId=company.Id
+                    new
+                    {
+                        Name = company.Name,
+                        Description = company.Description,
+                        Industry = company.Industry,
+                        Website = company.Website,
+                        Email = company.Email,
+                        Phone = company.Phone,
+                        Addressline1 = company.AddressLine1,
+                        Addressline2 = company.AddressLine2,
+                        City = company.City,
+                        State = company.State,
+                        Country = company.Country,
+                        Postalcode = company.PostalCode,
+                        Logosurl = company.LogosUrl,
+                        CompanySize = company.CompanySize,
+                        FoundedYear = company.FoundedYear,
+                        UpdatedBy = company.UpdatedBy,
+                        CompanyId = company.Id
                     });
             }
             catch (Exception ex)
@@ -192,11 +179,7 @@ namespace JobPortalAPI.Repositories
                     "SELECT delete_company(@Id,@UpdatedBy);";
 
 
-                using var connection =
-                    _dbAccess.CreateConnection();
-
-
-                return await connection.ExecuteScalarAsync<bool>(
+                return await _dbExecutor.ExecuteScalarAsync<bool>(
                     sql,
                     new
                     {

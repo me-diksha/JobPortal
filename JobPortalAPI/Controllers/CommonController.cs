@@ -24,5 +24,11 @@ namespace JobPortalAPI.Controllers
 
             return Ok(result);
         }
+        [HttpGet("all/employmentType")]
+        public async Task<IActionResult> GetAllEmploymentType()
+        {
+            var result = await _commonService.GetAllEmploymentType();
+            return Ok(result);
+        }
     }
 }

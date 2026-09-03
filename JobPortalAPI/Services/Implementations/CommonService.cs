@@ -16,5 +16,9 @@ namespace JobPortalAPI.Services.Implementations
         {
             return await _repository.GetAllSkills();
         }
+        public async Task<IEnumerable<EmploymentType>> GetAllEmploymentType()
+        {
+            return await _repository.GetAllEmploymentType();
+        }
     }
 }

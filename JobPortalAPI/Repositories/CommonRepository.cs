@@ -7,11 +7,12 @@ namespace JobPortalAPI.Repositories
 {
     public class CommonRepository:ICommonRepository
     {
-        private readonly IDbAccess _dbAccess;
+       
         private readonly ILogger<CommonRepository> _logger;
-        public CommonRepository(IDbAccess dbAccess,ILogger<CommonRepository> commonlogger) {
+        private readonly IDbExecutor _dbExecutor;
+        public CommonRepository(IDbExecutor dbExecutor,ILogger<CommonRepository> commonlogger) {
 
-            _dbAccess = dbAccess;
+            _dbExecutor = dbExecutor;
             _logger = commonlogger;
            
         }
@@ -23,12 +24,7 @@ namespace JobPortalAPI.Repositories
                 const string sql =
                     "SELECT * FROM get_all_skills();";
 
-
-                using var connection =
-                    _dbAccess.CreateConnection();
-
-
-                return await connection.QueryAsync<Skills>(sql);
+                return await _dbExecutor.QueryAsync<Skills>(sql);
             }
             catch (Exception ex)
             {
@@ -36,6 +32,22 @@ namespace JobPortalAPI.Repositories
                 throw;
             }
         }
-        
+
+        public async Task<IEnumerable<EmploymentType>> GetAllEmploymentType()
+        {
+            try
+            {
+                const string sql =
+                    "SELECT * FROM get_all_employmenttype();";
+
+                return await _dbExecutor.QueryAsync<EmploymentType>(sql);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting skills list");
+                throw;
+            }
+        }
+
     }
 }
