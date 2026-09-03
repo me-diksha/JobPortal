@@ -1,5 +1,6 @@
 ﻿using JobPortalAPI.Models.Common;
 using JobPortalAPI.Models.Requests;
+using JobPortalAPI.Services;
 using JobPortalAPI.Services.Abstractions;
 using JobPortalAPI.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace JobPortalAPI.Controllers
         }
 
         [HttpGet("createJob")]
-        public async Task<IActionResult> CreateCompany(JobRequest request)
+        public async Task<IActionResult> CreateJob(JobRequest request)
         {
             var recruiter = await _recruiterService.GetProfile(UserId);
 
@@ -55,6 +56,14 @@ namespace JobPortalAPI.Controllers
                 Deadline = request.Deadline,
                 CreatedBy = UserId
             };
+            var result =await _jobService.CreateJob(job);
+
+
+            return Ok(new
+            {
+                message = "Job created successfully",
+                id = result
+            });
         }
 
     }
