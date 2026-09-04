@@ -3,12 +3,23 @@ export interface Job {
     title: string;
     description: string;
     location?: string;
-    refEmploymentType: number;
     employmentType?: string;
     experienceLevel?: string;
     minSalary?: number;
     maxSalary?: number;
+    status?: string;
     deadline?: string;
-    status: string;
-    companyName: string;
+    companyName?: string;
+    createdAt?: string;
+}
+
+export interface JobRequest {
+    title: string;
+    description: string;
+    location?: string;
+    refEmploymentType?: number;
+    experienceLevel?: string;
+    minSalary?: number;
+    maxSalary?: number;
+    deadline?: string;
 }

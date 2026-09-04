@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/authStore.ts';
 import { roles } from '@/common/PermissionRoles.ts';
 import RecruiterProfile from '@/views/recruiter/RecruiterProfile.vue';
 import Company from '@/views/Company/Company.vue';
+import RecuiterJobs from '@/composables/Recruiter/Job/RecuiterJobs.vue';
+import CreateJob from '@/composables/Recruiter/Job/CreateJob.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,7 +59,15 @@ const router = createRouter({
     }, {
       path: "/company",
       component: Company
-    }
+    }, {
+      path: "/recruiter/jobs",
+      component: RecuiterJobs
+    },
+    {
+      path: "/recruiter/jobs/create",
+      component: CreateJob
+    },
+
   ],
 })
 router.beforeEach((to) => {
