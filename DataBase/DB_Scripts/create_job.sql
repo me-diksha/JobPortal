@@ -1,19 +1,9 @@
-CREATE OR REPLACE FUNCTION create_job
-(
-    p_companyid BIGINT,
-    p_title VARCHAR,
-    p_description TEXT,
-    p_location VARCHAR,
-    p_refemploymenttype VARCHAR,
-    p_experiencelevel VARCHAR,
-    p_minsalary NUMERIC,
-    p_maxsalary NUMERIC,
-    p_deadline DATE,
-    p_createdby BIGINT
-)
-RETURNS BIGINT
-LANGUAGE plpgsql
-AS $$
+-- DROP FUNCTION public.create_job(int8, varchar, text, varchar, varchar, varchar, numeric, numeric, date, int8);
+
+CREATE OR REPLACE FUNCTION public.create_job(p_companyid bigint, p_title character varying, p_description text, p_location character varying, p_refemploymenttype bigint, p_refexperiencelevel bigint, p_minsalary numeric, p_maxsalary numeric, p_deadline date, p_createdby bigint)
+ RETURNS bigint
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
     v_id BIGINT;
 BEGIN
@@ -25,7 +15,8 @@ BEGIN
         description,
         location,
         refemploymenttype,
-        experiencelevel,
+        refexperiencelevel,
+		refstatus,
         minsalary,
         maxsalary,
         deadline,
@@ -39,6 +30,7 @@ BEGIN
         p_location,
         p_employmenttype,
         p_experiencelevel,
+		1,
         p_minsalary,
         p_maxsalary,
         p_deadline,
@@ -48,4 +40,5 @@ BEGIN
 
     RETURN v_id;
 END;
-$$;
+$function$
+;

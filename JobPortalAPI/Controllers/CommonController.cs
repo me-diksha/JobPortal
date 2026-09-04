@@ -30,5 +30,17 @@ namespace JobPortalAPI.Controllers
             var result = await _commonService.GetAllEmploymentType();
             return Ok(result);
         }
+        [HttpGet("all/experienceLevel")]
+        public async Task<IActionResult> GetAllExperienceLevel()
+        {
+            var result = await _commonService.GetAllExperienceLevel();
+            return Ok(result);
+        }
+        [HttpGet("all/jobStatus")]
+        public async Task<IActionResult> GetAllJobStatus()
+        {
+            var result = await _commonService.GetAllJobStatus();
+            return Ok(result);
+        }
     }
 }

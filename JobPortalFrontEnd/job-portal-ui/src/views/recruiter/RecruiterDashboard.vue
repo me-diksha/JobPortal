@@ -25,8 +25,8 @@ const gotoProfile =()=>{
 const recruiterMenu = [
   { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
   { name: "Company Profile", icon: "🏢", path: "/company" },
-  { name: "Post Job", icon: "📢", path: "/postJob" },
-  { name: "Manage Jobs", icon: "💼", path: "/manageJobs" },
+  { name: "Post Job", icon: "📢", path: "/recruiter/jobs/create" },
+  { name: "Manage Jobs", icon: "💼", path: "/recruiter/jobs" },
   { name: "Candidates", icon: "👥", path: "/candidates" },
   { name: "Interviews", icon:"📅", path: "/interview"},
   {name: "Shortlisted", icon:"⭐", path: "shortlisted"}

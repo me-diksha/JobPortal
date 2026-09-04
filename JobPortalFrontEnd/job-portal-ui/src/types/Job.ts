@@ -18,7 +18,7 @@ export interface JobRequest {
     description: string;
     location?: string;
     refEmploymentType?: number;
-    experienceLevel?: string;
+    refExperienceLevel?: number;
     minSalary?: number;
     maxSalary?: number;
     deadline?: string;

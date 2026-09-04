@@ -44,7 +44,37 @@ namespace JobPortalAPI.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting skills list");
+                _logger.LogError(ex, "Error getting EmploymentType list");
+                throw;
+            }
+        }
+        public async Task<IEnumerable<ExperienceLevel>> GetAllExperienceLevel()
+        {
+            try
+            {
+                const string sql =
+                    "SELECT * FROM get_all_experiencelevel();";
+
+                return await _dbExecutor.QueryAsync<ExperienceLevel>(sql);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Experience Level cache");
+                throw;
+            }
+        }
+        public async Task<IEnumerable<JobStatus>> GetAllJobStatus()
+        {
+            try
+            {
+                const string sql =
+                    "SELECT * FROM get_all_jobStatus();";
+
+                return await _dbExecutor.QueryAsync<JobStatus>(sql);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Job Status Cache");
                 throw;
             }
         }

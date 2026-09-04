@@ -15,6 +15,9 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@tiptap/extension-underline": "^3.31.2",
+    "@tiptap/starter-kit": "^3.31.2",
+    "@tiptap/vue-3": "^3.31.2",
     "axios": "^1.19.0",
     "jwt-decode": "^4.0.0",
     "pinia": "^4.0.3",

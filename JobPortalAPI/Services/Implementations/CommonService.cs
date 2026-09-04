@@ -20,5 +20,14 @@ namespace JobPortalAPI.Services.Implementations
         {
             return await _repository.GetAllEmploymentType();
         }
+        public async Task<IEnumerable<ExperienceLevel>> GetAllExperienceLevel()
+        {
+            return await _repository.GetAllExperienceLevel();
+        }
+        public async Task<IEnumerable<JobStatus>> GetAllJobStatus()
+        {
+            return await _repository.GetAllJobStatus();
+        }
+
     }
 }

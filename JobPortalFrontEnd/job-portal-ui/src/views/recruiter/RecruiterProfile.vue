@@ -16,7 +16,7 @@ import type { RecruiterProfile as RecruiterProfileType }
 import { GetRecruiterProfile } from "@/composables/Recruiter/RecruiterProfile/UseRecruiterGetProfile";
 import { useCompanyStore } from "@/stores/companyStore";
 
-const companyStore =useCompanyStore(); //tostore company id so can be used by company.vue
+const companyStore = useCompanyStore(); //tostore company id so can be used by company.vue
 const isEdit = ref(false);
 
 const loading = ref(false);
@@ -29,48 +29,13 @@ const recruiterProfile =
 
 const recruiterMenu = [
 
-    {
-        name: "Dashboard",
-        icon: "🏠",
-        path: "/recruiterDashboard"
-    },
-
-    {
-        name: "Company Profile",
-        icon: "🏢",
-        path: "/company"
-    },
-
-    {
-        name: "Post Job",
-        icon: "📢",
-        path: "/postJob"
-    },
-
-    {
-        name: "Manage Jobs",
-        icon: "💼",
-        path: "/manageJobs"
-    },
-
-    {
-        name: "Candidates",
-        icon: "👥",
-        path: "/candidates"
-    },
-
-    {
-        name: "Interviews",
-        icon: "📅",
-        path: "/interview"
-    },
-
-    {
-        name: "Shortlisted",
-        icon: "⭐",
-        path: "/shortlisted"
-    }
-
+    { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
+    { name: "Company Profile", icon: "🏢", path: "/company" },
+    { name: "Post Job", icon: "📢", path: "/recruiter/jobs/create" },
+    { name: "Manage Jobs", icon: "💼", path: "/recruiter/jobs" },
+    { name: "Candidates", icon: "👥", path: "/candidates" },
+    { name: "Interviews", icon: "📅", path: "/interview" },
+    { name: "Shortlisted", icon: "⭐", path: "shortlisted" }
 ];
 
 
@@ -107,8 +72,8 @@ const loadProfile = async () => {
 
         recruiterProfile.value =
             response.data;
-        if (response.data.companyId){
-        companyStore.setCompanyId(response.data.companyId);
+        if (response.data.companyId) {
+            companyStore.setCompanyId(response.data.companyId);
         }
         console.log(
             "Recruiter Profile:",
@@ -163,97 +128,75 @@ const updateProfile = (
 
 <template>
 
-<div class="dashboard">
+    <div class="dashboard">
 
 
-    <!-- Sidebar -->
+        <!-- Sidebar -->
 
-    <Sidebar
-        companyName="Jobsy"
-        slogan="Find Your Sea"
-        :logo="logo"
-        :menuItems="recruiterMenu"
-        :bottomMenu="bottomMenu"
-    />
+        <Sidebar companyName="Jobsy" slogan="Find Your Sea" :logo="logo" :menuItems="recruiterMenu"
+            :bottomMenu="bottomMenu" />
 
 
-    <!-- Main -->
+        <!-- Main -->
 
-    <section class="main">
-
-
-        <div class="profile-page">
+        <section class="main">
 
 
-            <!-- Loading -->
+            <div class="profile-page">
 
-            <div
-                v-if="loading"
-                class="message"
-            >
 
-                Loading profile...
+                <!-- Loading -->
+
+                <div v-if="loading" class="message">
+
+                    Loading profile...
+
+                </div>
+
+
+                <!-- Error -->
+
+                <div v-else-if="error" class="error-box">
+
+                    {{ error }}
+
+                </div>
+
+
+                <!-- Profile -->
+
+                <template v-else-if="recruiterProfile">
+
+
+                    <ProfileHeader :first-name="recruiterProfile.firstName" :last-name="recruiterProfile.lastName"
+                        :subtitle="recruiterProfile.designation" @edit="editProfile" />
+
+
+                    <RecruiterInfoCard :profile="recruiterProfile" @update="updateProfile" />
+
+
+                </template>
+
+
+                <!-- No profile -->
+
+                <div v-else class="message">
+
+                    Recruiter profile not found.
+
+                </div>
+
 
             </div>
 
+        </section>
 
-            <!-- Error -->
-
-            <div
-                v-else-if="error"
-                class="error-box"
-            >
-
-                {{ error }}
-
-            </div>
-
-
-            <!-- Profile -->
-
-            <template v-else-if="recruiterProfile">
-
-
-                <ProfileHeader
-                    :first-name="recruiterProfile.firstName"
-                    :last-name="recruiterProfile.lastName"
-                    :subtitle="recruiterProfile.designation"
-                    @edit="editProfile"
-                />
-
-
-                <RecruiterInfoCard
-                    :profile="recruiterProfile"
-                    @update="updateProfile"
-                />
-
-
-            </template>
-
-
-            <!-- No profile -->
-
-            <div
-                v-else
-                class="message"
-            >
-
-                Recruiter profile not found.
-
-            </div>
-
-
-        </div>
-
-    </section>
-
-</div>
+    </div>
 
 </template>
 
 
 <style scoped>
-
 .dashboard {
 
     display: flex;
@@ -311,5 +254,4 @@ const updateProfile = (
     border-radius: 8px;
 
 }
-
 </style>

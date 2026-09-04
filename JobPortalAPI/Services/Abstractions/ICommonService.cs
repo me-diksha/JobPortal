@@ -8,5 +8,7 @@ namespace JobPortalAPI.Services.Abstractions
     {
         Task<IEnumerable<Skills>> GetAllSkills();
         Task<IEnumerable<EmploymentType>> GetAllEmploymentType();
+        Task<IEnumerable<JobStatus>> GetAllJobStatus();
+        Task<IEnumerable<ExperienceLevel>> GetAllExperienceLevel();
     }
 }

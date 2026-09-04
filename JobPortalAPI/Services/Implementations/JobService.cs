@@ -74,8 +74,8 @@ namespace JobPortalAPI.Services
                     RefEmploymentType =
                         request.RefEmploymentType,
 
-                    ExperienceLevel =
-                        request.ExperienceLevel,
+                    RefExperienceLevel =
+                         request.RefExperienceLevel,
 
                     MinSalary =
                         request.MinSalary,
@@ -207,8 +207,8 @@ namespace JobPortalAPI.Services
                     RefEmploymentType =
                         request.RefEmploymentType,
 
-                    ExperienceLevel =
-                        request.ExperienceLevel,
+                    RefExperienceLevel =
+                        request.RefExperienceLevel,
 
                     MinSalary =
                         request.MinSalary,
