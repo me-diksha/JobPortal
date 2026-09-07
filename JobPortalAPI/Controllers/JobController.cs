@@ -9,7 +9,6 @@ namespace JobPortalAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class JobController : ControllerBase
     {
         private readonly IJobService _jobService;

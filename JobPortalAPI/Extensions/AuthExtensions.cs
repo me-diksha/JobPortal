@@ -4,6 +4,7 @@ using JobPortalAPI.Services.Abstractions;
 using JobPortalAPI.Services.Implementations;
 using JobPortalAPI.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -15,7 +16,7 @@ namespace JobPortalAPI.Extensions
         {
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
+            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
             

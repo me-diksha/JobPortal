@@ -5,7 +5,7 @@ export const CreateJob = async (
     payload: JobRequest
 ) => {
     return await api.post(
-        "/job/createjob",
+        "/job/createJob",
         payload
     );
 };

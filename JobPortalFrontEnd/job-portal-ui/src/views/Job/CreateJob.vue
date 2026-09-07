@@ -3,6 +3,7 @@
 import {
     onMounted,
     reactive,
+    onBeforeUnmount,
     ref
 } from "vue";
 
@@ -52,7 +53,9 @@ const employmentTypes =
 const experienceLevels =
     ref<ExperienceLevel[]>([]);
 
-
+onBeforeUnmount(() => {
+    editor.value?.destroy();
+});
 /*
 |--------------------------------------------------------------------------
 | Recruiter Sidebar
@@ -300,7 +303,7 @@ const submitJob = async () => {
         form.deadline =
             undefined;
 
-
+        editor.value?.commands.clearContent();
     } catch (err: any) {
 
         console.error(
