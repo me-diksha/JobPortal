@@ -12,7 +12,13 @@ import logo from "@/assets/JobPortal_logo.png";
 import {
     GetRecruiterJobs
 } from "@/composables/Job/UseGetRecruiterJob";
+import {
+    GetAllJobStatusList
+} from "@/composables/Common/UseGetAllJobStatus";
 
+import {
+    UpdateJobStatus
+} from "@/composables/Job/UseUpdateJobStatus";
 import type {
     Job
 } from "@/types/Job";
@@ -26,7 +32,11 @@ const loading =
 
 const error =
     ref("");
+const jobStatuses = ref<any[]>([]);
 
+const openStatusJobId = ref<number | null>(null);
+
+const statusLoading = ref(false);
 
 const recruiterMenu = [
 
@@ -59,7 +69,21 @@ const bottomMenu = [
 
 ];
 
+const loadJobStatuses = async () => {
+    try {
+        const response =
+            await GetAllJobStatusList();
 
+        jobStatuses.value =
+            response.data ?? [];
+    }
+    catch (err) {
+        console.error(
+            "Error loading job statuses:",
+            err
+        );
+    }
+};
 const loadJobs = async () => {
 
     try {
@@ -132,10 +156,60 @@ const formatDate = (
 
 };
 
+const toggleStatusDropdown = (
+    jobId: number
+) => {
+    if (openStatusJobId.value === jobId) {
+        openStatusJobId.value = null;
+    }
+    else {
+        openStatusJobId.value = jobId;
+    }
+};
 
+const changeJobStatus = async (
+    job: Job,
+    statusId: number
+) => {
+    try {
+        statusLoading.value = true;
+
+        await UpdateJobStatus(
+            job.id,
+            statusId
+        );
+
+        // Reload jobs so the latest status comes from DB
+        await loadJobs();
+
+        openStatusJobId.value = null;
+    }
+    catch (err: any) {
+        console.error(
+            "Error updating job status:",
+            err
+        );
+
+        error.value =
+            err.response?.data?.message ||
+            "Failed to update job status";
+    }
+    finally {
+        statusLoading.value = false;
+    }
+};
+const getStatusClass = (status?: string) => {
+    if (!status) return "unknown";
+
+    return status
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-");
+};
 onMounted(() => {
 
     loadJobs();
+    loadJobStatuses();
 
 });
 
@@ -255,11 +329,31 @@ onMounted(() => {
                             </div>
 
 
-                            <span class="status-badge" :class="job.status
-                                ?.toLowerCase()
-                                ">
-                                {{ job.status || "Draft" }}
-                            </span>
+                            <div class="status-wrapper">
+
+                                <button class="status-badge" :class="getStatusClass(job.status)"
+                                    @click="toggleStatusDropdown(job.id)">
+                                    {{ job.status || "Draft" }}
+
+                                    <span class="status-arrow">
+                                        ▾
+                                    </span>
+                                </button>
+
+                                <div v-if="openStatusJobId === job.id" class="status-dropdown">
+
+                                    <button v-for="status in jobStatuses" :key="status.id" class="status-option" :class="[
+                                        getStatusClass(status.description),
+                                        {
+                                            active: status.description === job.status
+                                        }
+                                    ]" @click=" changeJobStatus(job,status.id)">
+                                        {{ status.description }}
+                                    </button>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -378,10 +472,6 @@ onMounted(() => {
 
                         <div class="job-card-footer">
 
-                            <span>
-                                Job ID:
-                                #{{ job.id }}
-                            </span>
 
                             <div>
 
@@ -509,6 +599,7 @@ onMounted(() => {
 }
 
 
+
 .jobs-grid {
 
     display: grid;
@@ -591,51 +682,78 @@ onMounted(() => {
 
 
 .status-badge {
-
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     height: fit-content;
-
-    padding: 5px 10px;
-
+    padding: 6px 12px;
     border-radius: 20px;
-
-    background: #e5e7eb;
-
-    color: #374151;
-
     font-size: 12px;
-
     font-weight: 600;
-
 }
-
-
-.status-badge.published {
-
-    background: #dcfce7;
-
-    color: #166534;
-
-}
-
 
 .status-badge.draft {
-
     background: #fef3c7;
-
     color: #92400e;
-
 }
 
+.status-badge.open {
+    background: #dcfce7;
+    color: #166534;
+}
 
 .status-badge.closed {
-
     background: #fee2e2;
-
     color: #991b1b;
-
 }
 
+.status-badge.actively-recruiting {
+    background: #dbeafe;
+    color: #1e40af;
+}
 
+.status-badge.archived {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.status-badge.on-hold {
+    background: #f3f4f6;
+    color: #374151;
+}
+.status-option.draft {
+    color: #92400e;
+}
+
+.status-option.open {
+    
+    color: #166534;
+}
+
+.status-option.closed {
+    
+    color: #991b1b;
+}
+
+.status-option.actively-recruiting {
+   
+    color: #1e40af;
+}
+
+.status-option.on-hold {
+   
+    color: #374151;
+}
+
+.status-option.archived {
+    
+    color: #6d28d9;
+}
+.status-option:hover {
+    opacity: 0.85;
+}
 .description {
 
     margin: 18px 0;
@@ -820,6 +938,7 @@ onMounted(() => {
     margin-bottom: 20px;
 
 }
+
 .job-description :deep(ul) {
     padding-left: 25px;
 }
@@ -834,6 +953,54 @@ onMounted(() => {
 
 .job-description :deep(u) {
     text-decoration: underline;
+}
+
+.status-wrapper {
+    position: relative;
+}
+
+.status-badge {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-arrow {
+    font-size: 11px;
+}
+
+.status-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 140px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 5px;
+    z-index: 100;
+}
+
+.status-option {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 9px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.status-option:hover {
+    background: #f3f4f6;
+}
+
+.status-option.active {
+    font-weight: 600;
 }
 
 @media (max-width: 700px) {

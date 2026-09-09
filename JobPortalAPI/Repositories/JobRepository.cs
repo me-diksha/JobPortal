@@ -108,6 +108,37 @@ namespace JobPortalAPI.Repositories
             }
         }
 
+        public async Task<bool> UpdateJobStatus(long jobId,long companyId,int statusId,int updatedBy)
+        {
+            try
+            {
+                const string sql = @"
+            SELECT update_job_status(
+                @JobId,
+                @CompanyId,
+                @StatusId,
+                @UpdatedBy
+            );";
+
+                return await _dbExecutor.ExecuteScalarAsync<bool>(
+                    sql,
+                    new
+                    {
+                        JobId = jobId,
+                        CompanyId = companyId,
+                        StatusId = statusId,
+                        UpdatedBy = updatedBy
+                    });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error updating job status");
+
+                throw;
+            }
+        }
         public async Task<JobResponse> UpdateJob(Job job)
         {
             try

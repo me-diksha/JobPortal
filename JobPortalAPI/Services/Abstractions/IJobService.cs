@@ -17,7 +17,7 @@ namespace JobPortalAPI.Services.Abstractions
 
         Task<IEnumerable<JobResponse>> GetRecruiterJobs(
             int userId);
-
+        Task<bool> UpdateJobStatus(long jobId, int userId, int statusId);
         Task<JobResponse> UpdateJob(
             long id,
             int userId,

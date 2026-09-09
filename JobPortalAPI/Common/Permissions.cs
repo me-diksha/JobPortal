@@ -10,6 +10,7 @@
         public const string CreateJob = "job.create";
         public const string EditJob = "job.edit";
         public const string ViewApplications = "application.view";
+        public const string EditRecruiterProfile = "profilerecruiter.edit";
 
         // Admin
         public const string ManageUsers = "user.manage";

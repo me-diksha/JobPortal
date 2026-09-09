@@ -13,7 +13,7 @@ namespace JobPortalAPI.Repositories.Abstractions
 
         Task<IEnumerable<JobResponse>> GetRecruiterJobs(
             long companyId);
-
+        Task<bool> UpdateJobStatus(long jobId, long companyId, int statusId, int updatedBy);
         Task<JobResponse> UpdateJob(Job job);
 
         Task<bool> DeleteJob(

@@ -147,6 +147,30 @@ namespace JobPortalAPI.Services
                 recruiter.CompanyId.Value);
         }
 
+        public async Task<bool> UpdateJobStatus(long jobId,int userId,int statusId)
+        {
+            if (jobId <= 0)
+                return false;
+
+            if (statusId <= 0)
+                return false;
+
+            var recruiter =
+                await _recruiterService.GetProfile(userId);
+
+            if (recruiter == null)
+                throw new UnauthorizedAccessException(
+                    "Recruiter not found");
+
+            if (recruiter.CompanyId == null ||
+                recruiter.CompanyId <= 0)
+            {
+                throw new ArgumentException(
+                    "Recruiter is not associated with a company");
+            }
+
+            return await _jobRepository.UpdateJobStatus(jobId,recruiter.CompanyId.Value,statusId,userId);
+        }
 
         // UPDATE JOB
         public async Task<JobResponse> UpdateJob(

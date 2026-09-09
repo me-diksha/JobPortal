@@ -55,6 +55,7 @@ namespace JobPortalAPI.Controllers
         }
 
         [HttpPut("updateprofile")]
+        [Authorize(Policy = Permissions.EditRecruiterProfile)]
         public async Task<IActionResult>UpdateProfile(RecruiterProfileRequest request)
         {
             var response = await _recruiterService.UpdateProfile(request, UserId);

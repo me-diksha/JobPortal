@@ -73,19 +73,20 @@ namespace JobPortalAPI.Controllers
         {
             var jobs =
                 await _jobService.GetAllJobs();
-
+            if (jobs == null) return NotFound("No Job Found");
             return Ok(jobs);
         }
 
 
         // GET RECRUITER JOBS
         [HttpGet("getrecruiterjobs")]
+        [Authorize(Policy = Permissions.EditJob)]
         public async Task<IActionResult> GetRecruiterJobs()
         {
             var jobs =
                 await _jobService.GetRecruiterJobs(
                     UserId);
-
+            if (jobs == null) return NotFound("No Job Found");
             return Ok(jobs);
         }
 
@@ -102,7 +103,7 @@ namespace JobPortalAPI.Controllers
                     id,
                     UserId,
                     request);
-
+            if (result == null) return Problem("Unable To Update Job");
             return Ok(new
             {
                 message = "Job updated successfully",
@@ -127,6 +128,38 @@ namespace JobPortalAPI.Controllers
             return Ok(new
             {
                 message = "Job deleted successfully"
+            });
+        }
+
+        [HttpPut("updateStatus")]
+        [Authorize(Policy = Permissions.EditJob)]
+        public async Task<IActionResult> UpdateJobStatus(long id,[FromBody] UpdateJobStatusRequest request)
+        {
+            if (request == null || request.StatusId <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid job status"
+                });
+            }
+
+            var result =
+                await _jobService.UpdateJobStatus(
+                    id,
+                    UserId,
+                    request.StatusId);
+
+            if (!result)
+            {
+                return NotFound(new
+                {
+                    message = "Job not found"
+                });
+            }
+
+            return Ok(new
+            {
+                message = "Job status updated successfully"
             });
         }
     }

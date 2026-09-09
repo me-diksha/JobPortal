@@ -111,6 +111,9 @@ const redirect = ()=>{
 }
 </script>
 <template>
+    <div class="For-back-btn">
+        <button @click ="redirect" class="back-btn">← Back</button>
+    </div>
     <div class="section-header">
         <h2>Company Details</h2>
         <button class="edit-btn">Edit</button>
@@ -164,7 +167,7 @@ const redirect = ()=>{
 
     align-items: center;
 
-    margin-bottom: 20px;
+    margin:20px;
 
 }
 
@@ -196,7 +199,16 @@ h2 {
     grid-template-columns: 1fr 1fr 1fr;
 
     gap: 20px;
+    margin:20px;
 
+}
+.For-back-btn{
+    margin: 20px;
+}
+.back-btn{
+    color:#334f9c;
+    font-size: medium;
+    border: none;
 }
 .modal-overlay {
     position: fixed;

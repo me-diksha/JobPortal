@@ -34,8 +34,8 @@ import type {
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-
-
+import { useRouter } from "vue-router";
+import { HTTP_StatusCodes } from "@/components/common/enum/HTTP_StatusCodes";
 const loading = ref(false);
 
 const loadingEmploymentTypes =
@@ -56,6 +56,8 @@ const experienceLevels =
 onBeforeUnmount(() => {
     editor.value?.destroy();
 });
+const ischangesSaved = ref(false);
+const router = useRouter();
 /*
 |--------------------------------------------------------------------------
 | Recruiter Sidebar
@@ -269,17 +271,10 @@ const submitJob = async () => {
             await CreateJob(payload);
 
 
-        console.log(
-            "Job created:",
-            response.data
-        );
-
-
-        alert(
-            "Job created successfully"
-        );
-
-
+        if(response.status == HTTP_StatusCodes.OK){
+            ischangesSaved.value = true;
+        }
+       
         // Reset form
 
         form.title = "";
@@ -337,7 +332,10 @@ onMounted(() => {
     loadExperienceLevels();
 
 });
-
+const redirect = () => {
+    ischangesSaved.value = false;
+    router.push("/recruiterDashboard");
+}
 </script>
 
 
@@ -626,7 +624,21 @@ level in experienceLevels
             </div>
 
         </section>
+        <div v-if="ischangesSaved" class="modal-overlay">
+            <div class="success-modal">
+                <div class="success-icon">
+                    ✓
+                </div>
 
+                <h2>Changes Saved!</h2>
+
+                <p>Your company details have been updated successfully.</p>
+
+                <button class="modal-btn" @click="redirect">
+                    OK
+                </button>
+            </div>
+        </div>
     </div>
 
 </template>
@@ -990,5 +1002,90 @@ level in experienceLevels
     font-size: 17px;
     font-weight: 700;
     margin: 12px 0 8px;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+.success-modal {
+    background: white;
+    width: 400px;
+    padding: 35px;
+    border-radius: 12px;
+
+    text-align: center;
+
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+    animation: modalFadeIn 0.25s ease;
+}
+
+.success-modal h2 {
+    margin: 15px 0 10px;
+    color: rgb(24, 46, 107);
+}
+
+.success-modal p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto;
+
+    border-radius: 50%;
+
+    background: #28a745;
+    color: white;
+
+    font-size: 42px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-btn {
+    background-color: rgb(24, 46, 107);
+    color: white;
+
+    border: none;
+    border-radius: 5px;
+
+    padding: 10px 30px;
+
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.modal-btn:hover {
+    background: #334f9c;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 </style>
