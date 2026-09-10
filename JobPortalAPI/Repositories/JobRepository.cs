@@ -174,7 +174,7 @@ namespace JobPortalAPI.Repositories
         public async Task<bool> DeleteJob(
             long id,
             long companyId,
-            long updatedBy)
+            int updatedBy)
         {
             try
             {

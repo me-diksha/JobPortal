@@ -19,6 +19,6 @@ namespace JobPortalAPI.Repositories.Abstractions
         Task<bool> DeleteJob(
             long id,
             long companyId,
-            long updatedBy);
+            int updatedBy);
     }
 }

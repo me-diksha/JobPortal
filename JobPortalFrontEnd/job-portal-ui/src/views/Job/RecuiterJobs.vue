@@ -5,7 +5,7 @@ import {
     onMounted,
     ref
 } from "vue";
-
+import { useToast } from "vue-toastification";
 import {
     useRouter
 } from "vue-router";
@@ -29,6 +29,8 @@ import {
 import type {
     Job
 } from "@/types/Job";
+import { DeleteJob } from "@/composables/Job/UseDeleteJob";
+import { HttpStatusCode } from "axios";
 
 
 /* =========================
@@ -51,7 +53,7 @@ const loading =
 const error =
     ref("");
 
-
+const toast = useToast();
 /* =========================
    STATUS DATA
 ========================= */
@@ -283,7 +285,21 @@ const editJob = (
 
 };
 
+const handleDelete = async(job :Job) =>{
+    try{
+         var id = job.id;
+        const response =
+                await DeleteJob(id);
+        if(response.status== HttpStatusCode.Ok)   {
+            toast.success("Job deleted successfully");
+            loadJobs();
+        }   
+    }catch(err){
+        console.error("Can't delete",err);
+    }
+ 
 
+}
 /* =========================
    STATUS DROPDOWN
 ========================= */
@@ -830,7 +846,7 @@ onMounted(() => {
                                     </button>
 
                                     <button
-                                        class="delete-btn"
+                                        class="delete-btn" @click ="handleDelete(job)"
                                     >
                                         Delete
                                     </button>
