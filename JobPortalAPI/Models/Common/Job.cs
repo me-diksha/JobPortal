@@ -14,6 +14,6 @@
         public decimal? MaxSalary { get; set; } 
         public DateOnly? Deadline { get; set; }
         public long CreatedBy { get; set; }
-        public long UpdatedBy { get; set; }
+        public int UpdatedBy { get; set; }
     }
 }

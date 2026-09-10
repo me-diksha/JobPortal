@@ -55,7 +55,7 @@ namespace JobPortalAPI.Repositories
             try
             {
                 const string sql =
-                    "SELECT * FROM get_job(@Id);";
+                    "SELECT * FROM get_jobs_byid(@Id);";
 
                 return await _dbExecutor.QueryFirstOrDefaultAsync<JobResponse>(
                     sql,

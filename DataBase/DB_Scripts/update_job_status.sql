@@ -11,7 +11,8 @@ BEGIN
     UPDATE jobs
     SET
         refstatus = p_statusid,
-        updatedat = CURRENT_TIMESTAMP
+        updatedat = CURRENT_TIMESTAMP,
+		updatedby = p_updatedby
     WHERE id = p_jobid
       AND companyid = p_companyid
       AND isdeleted = 0;

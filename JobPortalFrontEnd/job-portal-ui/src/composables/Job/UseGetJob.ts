@@ -1,6 +1,6 @@
 import api from "@/api/axios";
 
-export const GetJob = async (
+export const GetJobById = async (
     id: number
 ) => {
     return await api.get(

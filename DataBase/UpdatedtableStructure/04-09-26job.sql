@@ -16,3 +16,11 @@ REFERENCES jobstatus(id);
 ALTER TABLE jobs
 DROP COLUMN experiencelevel,
 DROP COLUMN status;
+
+ALTER TABLE jobs
+ADD COLUMN updatedby INT;
+
+ALTER TABLE jobs
+ADD CONSTRAINT fk_jobs_updatedbyuser
+FOREIGN KEY (updatedby)
+REFERENCES users(id);

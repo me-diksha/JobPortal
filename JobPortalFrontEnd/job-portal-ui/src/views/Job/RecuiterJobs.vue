@@ -1,9 +1,14 @@
+```vue
 <script setup lang="ts">
 
 import {
     onMounted,
     ref
 } from "vue";
+
+import {
+    useRouter
+} from "vue-router";
 
 import Sidebar from "@/components/common/SideBar.vue";
 
@@ -12,6 +17,7 @@ import logo from "@/assets/JobPortal_logo.png";
 import {
     GetRecruiterJobs
 } from "@/composables/Job/UseGetRecruiterJob";
+
 import {
     GetAllJobStatusList
 } from "@/composables/Common/UseGetAllJobStatus";
@@ -19,10 +25,22 @@ import {
 import {
     UpdateJobStatus
 } from "@/composables/Job/UseUpdateJobStatus";
+
 import type {
     Job
 } from "@/types/Job";
 
+
+/* =========================
+   ROUTER
+========================= */
+
+const router = useRouter();
+
+
+/* =========================
+   JOB DATA
+========================= */
 
 const jobs =
     ref<Job[]>([]);
@@ -32,21 +50,70 @@ const loading =
 
 const error =
     ref("");
-const jobStatuses = ref<any[]>([]);
 
-const openStatusJobId = ref<number | null>(null);
 
-const statusLoading = ref(false);
+/* =========================
+   STATUS DATA
+========================= */
+
+const jobStatuses =
+    ref<any[]>([]);
+
+const openStatusJobId =
+    ref<number | null>(null);
+
+const statusLoading =
+    ref(false);
+
+
+/* =========================
+   SIDEBAR
+========================= */
 
 const recruiterMenu = [
 
-    { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
-    { name: "Company Profile", icon: "🏢", path: "/company" },
-    { name: "Post Job", icon: "📢", path: "/recruiter/jobs/create" },
-    { name: "Manage Jobs", icon: "💼", path: "/recruiter/jobs" },
-    { name: "Candidates", icon: "👥", path: "/candidates" },
-    { name: "Interviews", icon: "📅", path: "/interview" },
-    { name: "Shortlisted", icon: "⭐", path: "shortlisted" }
+    {
+        name: "Dashboard",
+        icon: "🏠",
+        path: "/recruiterDashboard"
+    },
+
+    {
+        name: "Company Profile",
+        icon: "🏢",
+        path: "/company"
+    },
+
+    {
+        name: "Post Job",
+        icon: "📢",
+        path: "/recruiter/jobs/create"
+    },
+
+    {
+        name: "Manage Jobs",
+        icon: "💼",
+        path: "/recruiter/jobs"
+    },
+
+    {
+        name: "Candidates",
+        icon: "👥",
+        path: "/candidates"
+    },
+
+    {
+        name: "Interviews",
+        icon: "📅",
+        path: "/interview"
+    },
+
+    {
+        name: "Shortlisted",
+        icon: "⭐",
+        path: "shortlisted"
+    }
+
 ];
 
 
@@ -69,54 +136,81 @@ const bottomMenu = [
 
 ];
 
-const loadJobStatuses = async () => {
-    try {
-        const response =
-            await GetAllJobStatusList();
 
-        jobStatuses.value =
-            response.data ?? [];
-    }
-    catch (err) {
-        console.error(
-            "Error loading job statuses:",
-            err
-        );
-    }
-};
-const loadJobs = async () => {
+/* =========================
+   LOAD JOB STATUSES
+========================= */
 
-    try {
+const loadJobStatuses =
+    async () => {
 
-        loading.value = true;
+        try {
 
-        error.value = "";
+            const response =
+                await GetAllJobStatusList();
 
-        const response =
-            await GetRecruiterJobs();
+            jobStatuses.value =
+                response.data ?? [];
 
-        jobs.value =
-            response.data ?? [];
+        }
+        catch (err) {
 
-    } catch (err: any) {
+            console.error(
+                "Error loading job statuses:",
+                err
+            );
 
-        console.error(
-            "Error loading jobs:",
-            err
-        );
+        }
 
-        error.value =
-            err.response?.data?.message ||
-            "Failed to load jobs";
+    };
 
-    } finally {
 
-        loading.value = false;
+/* =========================
+   LOAD JOBS
+========================= */
 
-    }
+const loadJobs =
+    async () => {
 
-};
+        try {
 
+            loading.value = true;
+
+            error.value = "";
+
+
+            const response =
+                await GetRecruiterJobs();
+
+
+            jobs.value =
+                response.data ?? [];
+
+        }
+        catch (err: any) {
+
+            console.error(
+                "Error loading jobs:",
+                err
+            );
+
+            error.value =
+                err.response?.data?.message ||
+                "Failed to load jobs";
+
+        }
+        finally {
+
+            loading.value = false;
+
+        }
+
+    };
+
+
+/* =========================
+   FORMAT SALARY
+========================= */
 
 const formatSalary = (
     value?: number
@@ -126,8 +220,11 @@ const formatSalary = (
         value === undefined ||
         value === null
     ) {
+
         return "-";
+
     }
+
 
     return new Intl.NumberFormat(
         "en-IN"
@@ -136,13 +233,20 @@ const formatSalary = (
 };
 
 
+/* =========================
+   FORMAT DATE
+========================= */
+
 const formatDate = (
     date?: string
 ) => {
 
     if (!date) {
+
         return "-";
+
     }
+
 
     return new Date(date)
         .toLocaleDateString(
@@ -156,35 +260,85 @@ const formatDate = (
 
 };
 
+
+/* =========================
+   EDIT JOB
+========================= */
+
+const editJob = (
+    job: Job
+) => {
+
+    /*
+     * Navigate to the SAME CreateJob.vue
+     * but pass the job ID.
+     */
+
+    router.push({
+        path: "/recruiter/jobs/create",
+        query: {
+            editId: job.id.toString()
+        }
+    });
+
+};
+
+
+/* =========================
+   STATUS DROPDOWN
+========================= */
+
 const toggleStatusDropdown = (
     jobId: number
 ) => {
-    if (openStatusJobId.value === jobId) {
+
+    if (
+        openStatusJobId.value ===
+        jobId
+    ) {
+
         openStatusJobId.value = null;
+
     }
     else {
-        openStatusJobId.value = jobId;
+
+        openStatusJobId.value =
+            jobId;
+
     }
+
 };
+
+
+/* =========================
+   CHANGE STATUS
+========================= */
 
 const changeJobStatus = async (
     job: Job,
     statusId: number
 ) => {
+
     try {
+
         statusLoading.value = true;
+
 
         await UpdateJobStatus(
             job.id,
             statusId
         );
 
-        // Reload jobs so the latest status comes from DB
+
         await loadJobs();
 
-        openStatusJobId.value = null;
+
+        openStatusJobId.value =
+            null;
+
     }
     catch (err: any) {
+
         console.error(
             "Error updating job status:",
             err
@@ -193,22 +347,62 @@ const changeJobStatus = async (
         error.value =
             err.response?.data?.message ||
             "Failed to update job status";
+
     }
     finally {
-        statusLoading.value = false;
+
+        statusLoading.value =
+            false;
+
     }
+
 };
-const getStatusClass = (status?: string) => {
-    if (!status) return "unknown";
+
+
+/* =========================
+   STATUS CLASS
+========================= */
+
+const getStatusClass = (
+    status?: string
+) => {
+
+    if (!status) {
+
+        return "unknown";
+
+    }
+
 
     return status
         .toLowerCase()
         .trim()
         .replace(/\s+/g, "-");
+
 };
+
+
+/* =========================
+   CREATE JOB
+========================= */
+
+const createJob = () => {
+
+    router.push(
+        "/recruiter/jobs/create"
+    );
+
+};
+
+
+/* =========================
+   MOUNT
+========================= */
+
 onMounted(() => {
 
     loadJobs();
+
     loadJobStatuses();
 
 });
@@ -220,16 +414,26 @@ onMounted(() => {
 
     <div class="dashboard">
 
-        <Sidebar companyName="Jobsy" slogan="Find Your Sea" :logo="logo" :menuItems="recruiterMenu"
-            :bottomMenu="bottomMenu" />
 
+        <!-- SIDEBAR -->
+
+        <Sidebar
+            companyName="Jobsy"
+            slogan="Find Your Sea"
+            :logo="logo"
+            :menuItems="recruiterMenu"
+            :bottomMenu="bottomMenu"
+        />
+
+
+        <!-- MAIN -->
 
         <section class="main">
 
             <div class="page-content">
 
 
-                <!-- Header -->
+                <!-- HEADER -->
 
                 <div class="page-header">
 
@@ -247,36 +451,45 @@ onMounted(() => {
                     </div>
 
 
-                    <button class="create-btn" @click="
-                        $router.push('/createJob')
-                        ">
+                    <button
+                        class="create-btn"
+                        @click="createJob"
+                    >
                         + Create Job
                     </button>
 
                 </div>
 
 
-                <!-- Loading -->
 
-                <div v-if="loading" class="state-message">
+                <!-- ERROR -->
 
-                    Loading jobs...
-
-                </div>
-
-
-                <!-- Error -->
-
-                <div v-else-if="error" class="error-message">
-
+                <div
+                    v-if="error"
+                    class="error-message"
+                >
                     {{ error }}
-
                 </div>
 
 
-                <!-- Empty -->
 
-                <div v-else-if="jobs.length === 0" class="empty-card">
+                <!-- LOADING -->
+
+                <div
+                    v-if="loading"
+                    class="state-message"
+                >
+                    Loading jobs...
+                </div>
+
+
+
+                <!-- EMPTY -->
+
+                <div
+                    v-else-if="jobs.length === 0"
+                    class="empty-card"
+                >
 
                     <div class="empty-icon">
                         💼
@@ -291,201 +504,344 @@ onMounted(() => {
                         jobs yet.
                     </p>
 
-                    <button class="create-btn" @click="
-                        $router.push('/createJob')
-                        ">
+                    <button
+                        class="create-btn"
+                        @click="createJob"
+                    >
                         Create Your First Job
                     </button>
 
                 </div>
 
 
-                <!-- Jobs -->
 
-                <div v-else class="jobs-grid">
+                <!-- JOB GRID -->
 
-                    <div v-for="job in jobs" :key="job.id" class="job-card">
+                <div
+                    v-else
+                    class="jobs-grid"
+                >
 
 
-                        <!-- Card Header -->
+                    <!-- JOB CARD -->
 
-                        <div class="job-card-header">
+                    <div
+                        v-for="job in jobs"
+                        :key="job.id"
+                        class="job-card"
+                    >
 
-                            <div>
 
-                                <h2>
-                                    {{ job.title }}
-                                </h2>
+                        <!-- =========================
+                             NORMAL VIEW
+                        ========================== -->
 
-                                <p v-if="
-                                    job.companyName
-                                " class="company">
-                                    🏢
-                                    {{
-                                        job.companyName
-                                    }}
-                                </p>
+
+                            <!-- CARD HEADER -->
+
+                            <div class="job-card-header">
+
+                                <div>
+
+                                    <h2>
+                                        {{ job.title }}
+                                    </h2>
+
+                                    <p
+                                        v-if="
+                                            job.companyName
+                                        "
+                                        class="company"
+                                    >
+                                        🏢
+                                        {{
+                                            job.companyName
+                                        }}
+                                    </p>
+
+                                </div>
+
+
+
+                                <!-- STATUS -->
+
+                                <div
+                                    class="status-wrapper"
+                                >
+
+                                    <button
+                                        class="status-badge"
+                                        :class="
+                                            getStatusClass(
+                                                job.status
+                                            )
+                                        "
+                                        @click="
+                                            toggleStatusDropdown(
+                                                job.id
+                                            )
+                                        "
+                                    >
+
+                                        {{
+                                            job.status ||
+                                            "Draft"
+                                        }}
+
+                                        <span
+                                            class="status-arrow"
+                                        >
+                                            ▾
+                                        </span>
+
+                                    </button>
+
+
+
+                                    <!-- STATUS OPTIONS -->
+
+                                    <div
+                                        v-if="
+                                            openStatusJobId ===
+                                            job.id
+                                        "
+                                        class="status-dropdown"
+                                    >
+
+                                        <button
+                                            v-for="
+                                                status in jobStatuses
+                                            "
+                                            :key="status.id"
+                                            class="status-option"
+                                            :class="[
+                                                getStatusClass(
+                                                    status.description
+                                                ),
+                                                {
+                                                    active:
+                                                        status.description ===
+                                                        job.status
+                                                }
+                                            ]"
+                                            :disabled="
+                                                statusLoading
+                                            "
+                                            @click="
+                                                changeJobStatus(
+                                                    job,
+                                                    status.id
+                                                )
+                                            "
+                                        >
+
+                                            {{
+                                                status.description
+                                            }}
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
 
-                            <div class="status-wrapper">
 
-                                <button class="status-badge" :class="getStatusClass(job.status)"
-                                    @click="toggleStatusDropdown(job.id)">
-                                    {{ job.status || "Draft" }}
+                            <!-- DESCRIPTION -->
 
-                                    <span class="status-arrow">
-                                        ▾
+                            <div
+                                class="job-description"
+                                v-html="
+                                    job.description
+                                "
+                            ></div>
+
+
+
+                            <!-- DETAILS -->
+
+                            <div class="job-details">
+
+
+                                <!-- LOCATION -->
+
+                                <div
+                                    v-if="
+                                        job.location
+                                    "
+                                    class="detail"
+                                >
+
+                                    <span
+                                        class="detail-label"
+                                    >
+                                        Location
                                     </span>
-                                </button>
 
-                                <div v-if="openStatusJobId === job.id" class="status-dropdown">
+                                    <span>
+                                        📍
+                                        {{
+                                            job.location
+                                        }}
+                                    </span>
 
-                                    <button v-for="status in jobStatuses" :key="status.id" class="status-option" :class="[
-                                        getStatusClass(status.description),
-                                        {
-                                            active: status.description === job.status
-                                        }
-                                    ]" @click=" changeJobStatus(job,status.id)">
-                                        {{ status.description }}
+                                </div>
+
+
+
+                                <!-- EMPLOYMENT -->
+
+                                <div
+                                    v-if="
+                                        job.employmentType
+                                    "
+                                    class="detail"
+                                >
+
+                                    <span
+                                        class="detail-label"
+                                    >
+                                        Employment
+                                    </span>
+
+                                    <span>
+                                        💼
+                                        {{
+                                            job.employmentType
+                                        }}
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- EXPERIENCE -->
+
+                                <div
+                                    v-if="
+                                        job.experienceLevel
+                                    "
+                                    class="detail"
+                                >
+
+                                    <span
+                                        class="detail-label"
+                                    >
+                                        Experience
+                                    </span>
+
+                                    <span>
+                                        🎓
+                                        {{
+                                            job.experienceLevel
+                                        }}
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- SALARY -->
+
+                                <div
+                                    v-if="
+                                        job.minSalary !== undefined ||
+                                        job.maxSalary !== undefined
+                                    "
+                                    class="detail"
+                                >
+
+                                    <span
+                                        class="detail-label"
+                                    >
+                                        Salary
+                                    </span>
+
+                                    <span>
+
+                                        ₹{{
+                                            formatSalary(
+                                                job.minSalary
+                                            )
+                                        }}
+
+                                        -
+
+                                        ₹{{
+                                            formatSalary(
+                                                job.maxSalary
+                                            )
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- DEADLINE -->
+
+                                <div
+                                    v-if="
+                                        job.deadline
+                                    "
+                                    class="detail"
+                                >
+
+                                    <span
+                                        class="detail-label"
+                                    >
+                                        Deadline
+                                    </span>
+
+                                    <span>
+                                        📅
+                                        {{
+                                            formatDate(
+                                                job.deadline
+                                            )
+                                        }}
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <!-- FOOTER -->
+
+                            <div
+                                class="job-card-footer"
+                            >
+
+                                <div>
+
+                                    <button
+                                        class="action-btn"
+                                        @click="
+                                            editJob(job)
+                                        "
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        class="delete-btn"
+                                    >
+                                        Delete
                                     </button>
 
                                 </div>
 
                             </div>
 
-                        </div>
+                        
 
-
-                        <!-- Description -->
-                        <div class="job-description" v-html="job.description"></div>
-
-
-                        <!-- Details -->
-
-                        <div class="job-details">
-
-                            <div v-if="
-                                job.location
-                            " class="detail">
-
-                                <span class="detail-label">
-                                    Location
-                                </span>
-
-                                <span>
-                                    📍
-                                    {{
-                                        job.location
-                                    }}
-                                </span>
-
-                            </div>
-
-
-                            <div v-if="
-                                job.employmentType
-                            " class="detail">
-
-                                <span class="detail-label">
-                                    Employment
-                                </span>
-
-                                <span>
-                                    💼
-                                    {{
-                                        job.employmentType
-                                    }}
-                                </span>
-
-                            </div>
-
-
-                            <div v-if="
-                                job.experienceLevel
-                            " class="detail">
-
-                                <span class="detail-label">
-                                    Experience
-                                </span>
-
-                                <span>
-                                    🎓
-                                    {{
-                                        job.experienceLevel
-                                    }}
-                                </span>
-
-                            </div>
-
-
-                            <div v-if="
-                                job.minSalary !== undefined ||
-                                job.maxSalary !== undefined
-                            " class="detail">
-
-                                <span class="detail-label">
-                                    Salary
-                                </span>
-
-                                <span>
-                                    ₹{{
-                                        formatSalary(
-                                            job.minSalary
-                                        )
-                                    }}
-                                    -
-                                    ₹{{
-                                        formatSalary(
-                                            job.maxSalary
-                                        )
-                                    }}
-                                </span>
-
-                            </div>
-
-
-                            <div v-if="
-                                job.deadline
-                            " class="detail">
-
-                                <span class="detail-label">
-                                    Deadline
-                                </span>
-
-                                <span>
-                                    📅
-                                    {{
-                                        formatDate(
-                                            job.deadline
-                                        )
-                                    }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- Footer -->
-
-                        <div class="job-card-footer">
-
-
-                            <div>
-
-                                <button class="action-btn">
-                                    Edit
-                                </button>
-
-                                <button class="delete-btn">
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </div>
+                      
 
                     </div>
 
@@ -500,7 +856,9 @@ onMounted(() => {
 </template>
 
 
+
 <style scoped>
+
 .dashboard {
 
     display: flex;
@@ -600,18 +958,28 @@ onMounted(() => {
 
 
 
+/* =========================
+   JOB GRID
+========================= */
+
 .jobs-grid {
 
     display: grid;
 
     grid-template-columns:
-        repeat(auto-fit,
-            minmax(340px, 1fr));
+        repeat(
+            auto-fit,
+            minmax(340px, 1fr)
+        );
 
     gap: 20px;
 
 }
 
+
+/* =========================
+   JOB CARD
+========================= */
 
 .job-card {
 
@@ -622,10 +990,13 @@ onMounted(() => {
     padding: 22px;
 
     box-shadow:
-        0 2px 10px rgba(0,
+        0 2px 10px
+        rgba(
             0,
             0,
-            0.05);
+            0,
+            0.05
+        );
 
     transition:
         transform 0.2s,
@@ -640,13 +1011,21 @@ onMounted(() => {
         translateY(-2px);
 
     box-shadow:
-        0 6px 18px rgba(0,
+        0 6px 18px
+        rgba(
             0,
             0,
-            0.08);
+            0,
+            0.08
+        );
 
 }
 
+
+
+/* =========================
+   CARD HEADER
+========================= */
 
 .job-card-header {
 
@@ -681,80 +1060,224 @@ onMounted(() => {
 }
 
 
-.status-badge {
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    height: fit-content;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+
+/* =========================
+   STATUS
+========================= */
+
+.status-wrapper {
+
+    position: relative;
+
 }
+
+
+.status-badge {
+
+    border: none;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    height: fit-content;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.status-arrow {
+
+    font-size: 11px;
+
+}
+
 
 .status-badge.draft {
+
     background: #fef3c7;
+
     color: #92400e;
+
 }
+
 
 .status-badge.open {
+
     background: #dcfce7;
+
     color: #166534;
+
 }
+
 
 .status-badge.closed {
+
     background: #fee2e2;
+
     color: #991b1b;
+
 }
+
 
 .status-badge.actively-recruiting {
+
     background: #dbeafe;
+
     color: #1e40af;
+
 }
+
 
 .status-badge.archived {
+
     background: #ede9fe;
+
     color: #6d28d9;
+
 }
+
 
 .status-badge.on-hold {
+
     background: #f3f4f6;
+
     color: #374151;
+
 }
+
+
+
+/* =========================
+   STATUS DROPDOWN
+========================= */
+
+.status-dropdown {
+
+    position: absolute;
+
+    top: calc(100% + 6px);
+
+    right: 0;
+
+    min-width: 140px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 6px 20px
+        rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+    padding: 5px;
+
+    z-index: 100;
+
+}
+
+
+.status-option {
+
+    width: 100%;
+
+    border: none;
+
+    background: transparent;
+
+    text-align: left;
+
+    padding: 9px 12px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+}
+
+
+.status-option:hover {
+
+    background: #f3f4f6;
+
+}
+
+
+.status-option.active {
+
+    font-weight: 600;
+
+}
+
+
 .status-option.draft {
+
     color: #92400e;
+
 }
+
 
 .status-option.open {
-    
+
     color: #166534;
+
 }
+
 
 .status-option.closed {
-    
+
     color: #991b1b;
+
 }
+
 
 .status-option.actively-recruiting {
-   
+
     color: #1e40af;
+
 }
+
 
 .status-option.on-hold {
-   
+
     color: #374151;
+
 }
 
+
 .status-option.archived {
-    
+
     color: #6d28d9;
+
 }
-.status-option:hover {
-    opacity: 0.85;
-}
-.description {
+
+
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.job-description {
 
     margin: 18px 0;
 
@@ -774,6 +1297,39 @@ onMounted(() => {
 
 }
 
+
+.job-description :deep(ul) {
+
+    padding-left: 25px;
+
+}
+
+
+.job-description :deep(ol) {
+
+    padding-left: 25px;
+
+}
+
+
+.job-description :deep(strong) {
+
+    font-weight: 700;
+
+}
+
+
+.job-description :deep(u) {
+
+    text-decoration: underline;
+
+}
+
+
+
+/* =========================
+   DETAILS
+========================= */
 
 .job-details {
 
@@ -816,6 +1372,11 @@ onMounted(() => {
 }
 
 
+
+/* =========================
+   FOOTER
+========================= */
+
 .job-card-footer {
 
     display: flex;
@@ -825,10 +1386,6 @@ onMounted(() => {
     justify-content: space-between;
 
     margin-top: 15px;
-
-    font-size: 12px;
-
-    color: #9ca3af;
 
 }
 
@@ -869,6 +1426,272 @@ onMounted(() => {
 }
 
 
+
+/* =========================
+   EDIT HEADER
+========================= */
+
+.edit-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+
+}
+
+
+.edit-header h2 {
+
+    margin: 0;
+
+    font-size: 20px;
+
+    color: #1f2937;
+
+}
+
+
+.close-btn {
+
+    border: none;
+
+    background: #f3f4f6;
+
+    color: #6b7280;
+
+    width: 30px;
+
+    height: 30px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+}
+
+
+.close-btn:hover {
+
+    background: #e5e7eb;
+
+}
+
+
+
+/* =========================
+   EDIT FORM
+========================= */
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.form-group label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 7px;
+
+    padding: 10px 12px;
+
+    font-size: 14px;
+
+    color: #1f2937;
+
+    background: white;
+
+    outline: none;
+
+    font-family: inherit;
+
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+
+    border-color: #4f46e5;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(
+            79,
+            70,
+            229,
+            0.1
+        );
+
+}
+
+
+.form-group textarea {
+
+    resize: vertical;
+
+    min-height: 150px;
+
+    line-height: 1.5;
+
+}
+
+
+.form-group input:disabled {
+
+    background: #f3f4f6;
+
+    color: #6b7280;
+
+    cursor: not-allowed;
+
+}
+
+
+.edit-row {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 15px;
+
+}
+
+
+.edit-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #eef0f4;
+
+}
+
+
+.cancel-btn,
+.save-btn {
+
+    border: none;
+
+    border-radius: 7px;
+
+    padding: 9px 16px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+.cancel-btn {
+
+    background: #f3f4f6;
+
+    color: #374151;
+
+}
+
+
+.cancel-btn:hover {
+
+    background: #e5e7eb;
+
+}
+
+
+.save-btn {
+
+    background: #4f46e5;
+
+    color: white;
+
+}
+
+
+.save-btn:hover {
+
+    background: #4338ca;
+
+}
+
+
+.save-btn:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+}
+
+
+
+/* =========================
+   EDIT ERROR
+========================= */
+
+.edit-error {
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    padding: 10px 12px;
+
+    border-radius: 7px;
+
+    margin-bottom: 15px;
+
+    font-size: 13px;
+
+}
+
+
+
+/* =========================
+   EMPTY / STATES
+========================= */
+
 .empty-card {
 
     background: white;
@@ -880,10 +1703,13 @@ onMounted(() => {
     text-align: center;
 
     box-shadow:
-        0 2px 10px rgba(0,
+        0 2px 10px
+        rgba(
             0,
             0,
-            0.05);
+            0,
+            0.05
+        );
 
 }
 
@@ -939,69 +1765,11 @@ onMounted(() => {
 
 }
 
-.job-description :deep(ul) {
-    padding-left: 25px;
-}
 
-.job-description :deep(ol) {
-    padding-left: 25px;
-}
 
-.job-description :deep(strong) {
-    font-weight: 700;
-}
-
-.job-description :deep(u) {
-    text-decoration: underline;
-}
-
-.status-wrapper {
-    position: relative;
-}
-
-.status-badge {
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.status-arrow {
-    font-size: 11px;
-}
-
-.status-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    min-width: 140px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    padding: 5px;
-    z-index: 100;
-}
-
-.status-option {
-    width: 100%;
-    border: none;
-    background: transparent;
-    text-align: left;
-    padding: 9px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.status-option:hover {
-    background: #f3f4f6;
-}
-
-.status-option.active {
-    font-weight: 600;
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 700px) {
 
@@ -1010,6 +1778,7 @@ onMounted(() => {
         padding: 20px;
 
     }
+
 
     .page-header {
 
@@ -1021,11 +1790,21 @@ onMounted(() => {
 
     }
 
+
     .jobs-grid {
 
         grid-template-columns: 1fr;
 
     }
 
+
+    .edit-row {
+
+        grid-template-columns: 1fr;
+
+    }
+
 }
+
 </style>
+```

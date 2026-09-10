@@ -4,13 +4,25 @@ import {
     onMounted,
     reactive,
     onBeforeUnmount,
-    ref
+    ref,
+    computed
 } from "vue";
 
 import Sidebar from "@/components/common/SideBar.vue";
+
 import logo from "@/assets/JobPortal_logo.png";
 
-import { CreateJob } from "@/composables/Job/UseCreateJob";
+import {
+    CreateJob
+} from "@/composables/Job/UseCreateJob";
+
+import {
+    UpdateJob
+} from "@/composables/Job/UseUpdateJob";
+
+import {
+    GetJobById
+} from "@/composables/Job/UseGetJob";
 
 import {
     GetAllEmploymentType
@@ -31,12 +43,70 @@ import type {
 import type {
     ExperienceLevel
 } from "@/types/ExperienceLevel";
-import { useEditor, EditorContent } from "@tiptap/vue-3";
+
+import {
+    useEditor,
+    EditorContent
+} from "@tiptap/vue-3";
+import CharacterCount from "@tiptap/extension-character-count";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import { useRouter } from "vue-router";
-import { HTTP_StatusCodes } from "@/components/common/enum/HTTP_StatusCodes";
+
+
+
+import {
+    useRouter,
+    useRoute
+} from "vue-router";
+
+import {
+    HTTP_StatusCodes
+} from "@/components/common/enum/HTTP_StatusCodes";
+
+
+/* =========================
+   ROUTER
+========================= */
+
+const router = useRouter();
+
+const route = useRoute();
+
+const isEditing = ref(false);
+/* =========================
+   EDIT MODE
+========================= */
+
+const editId = computed(() => {
+
+    const id = route.query.editId;
+
+    if (!id) {
+        return null;
+    }
+
+    const numericId = Number(id);
+
+    return Number.isNaN(numericId)
+        ? null
+        : numericId;
+
+});
+
+
+const isEditMode = computed(() => {
+
+    return editId.value !== null;
+
+});
+
+
+/* =========================
+   LOADING
+========================= */
+
 const loading = ref(false);
+
+const loadingJob = ref(false);
 
 const loadingEmploymentTypes =
     ref(false);
@@ -44,8 +114,17 @@ const loadingEmploymentTypes =
 const loadingExperienceLevels =
     ref(false);
 
+
+/* =========================
+   ERROR
+========================= */
+
 const error = ref("");
 
+
+/* =========================
+   DROPDOWNS
+========================= */
 
 const employmentTypes =
     ref<EmploymentType[]>([]);
@@ -53,26 +132,62 @@ const employmentTypes =
 const experienceLevels =
     ref<ExperienceLevel[]>([]);
 
-onBeforeUnmount(() => {
-    editor.value?.destroy();
-});
-const ischangesSaved = ref(false);
-const router = useRouter();
-/*
-|--------------------------------------------------------------------------
-| Recruiter Sidebar
-|--------------------------------------------------------------------------
-*/
+
+/* =========================
+   SUCCESS MODAL
+========================= */
+
+const ischangesSaved =
+    ref(false);
+
+
+/* =========================
+   SIDEBAR
+========================= */
 
 const recruiterMenu = [
 
-    { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
-    { name: "Company Profile", icon: "🏢", path: "/company" },
-    { name: "Post Job", icon: "📢", path: "/recruiter/jobs/create" },
-    { name: "Manage Jobs", icon: "💼", path: "/recruiter/jobs" },
-    { name: "Candidates", icon: "👥", path: "/candidates" },
-    { name: "Interviews", icon: "📅", path: "/interview" },
-    { name: "Shortlisted", icon: "⭐", path: "shortlisted" }
+    {
+        name: "Dashboard",
+        icon: "🏠",
+        path: "/recruiterDashboard"
+    },
+
+    {
+        name: "Company Profile",
+        icon: "🏢",
+        path: "/company"
+    },
+
+    {
+        name: "Post Job",
+        icon: "📢",
+        path: "/recruiter/jobs/create"
+    },
+
+    {
+        name: "Manage Jobs",
+        icon: "💼",
+        path: "/recruiter/jobs"
+    },
+
+    {
+        name: "Candidates",
+        icon: "👥",
+        path: "/candidates"
+    },
+
+    {
+        name: "Interviews",
+        icon: "📅",
+        path: "/interview"
+    },
+
+    {
+        name: "Shortlisted",
+        icon: "⭐",
+        path: "shortlisted"
+    }
 
 ];
 
@@ -97,11 +212,9 @@ const bottomMenu = [
 ];
 
 
-/*
-|--------------------------------------------------------------------------
-| Form
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   FORM
+========================= */
 
 const form = reactive<JobRequest>({
 
@@ -128,112 +241,306 @@ const form = reactive<JobRequest>({
 
 });
 
-/* editor*/
+
+/* =========================
+   TIPTAP EDITOR
+========================= */
+
+const MAX_DESCRIPTION_LENGTH = 1000;
+
 const editor = useEditor({
     content: form.description,
-
     extensions: [
         StarterKit,
-        Underline,
+        CharacterCount.configure({
+            limit: MAX_DESCRIPTION_LENGTH
+        })
     ],
 
     onUpdate: ({ editor }) => {
+    
         form.description = editor.getHTML();
-    },
+    }
 });
-/*
-|--------------------------------------------------------------------------
-| Load Employment Types
-|--------------------------------------------------------------------------
-*/
 
-const loadEmploymentTypes = async () => {
 
-    try {
+/* =========================
+   DESTROY EDITOR
+========================= */
 
-        loadingEmploymentTypes.value =
-            true;
+onBeforeUnmount(() => {
 
-        const response =
-            await GetAllEmploymentType();
+    editor.value?.destroy();
 
-        employmentTypes.value =
-            response.data ?? [];
+});
 
-    } catch (err) {
 
-        console.error(
-            "Error loading employment types:",
-            err
-        );
+/* =========================
+   LOAD EMPLOYMENT TYPES
+========================= */
 
-        error.value =
-            "Failed to load employment types";
+const loadEmploymentTypes =
+    async () => {
 
-    } finally {
+        try {
 
-        loadingEmploymentTypes.value =
-            false;
+            loadingEmploymentTypes.value =
+                true;
 
-    }
+            const response =
+                await GetAllEmploymentType();
+
+            employmentTypes.value =
+                response.data ?? [];
+
+        }
+        catch (err) {
+
+            console.error(
+                "Error loading employment types:",
+                err
+            );
+
+            error.value =
+                "Failed to load employment types";
+
+        }
+        finally {
+
+            loadingEmploymentTypes.value =
+                false;
+
+        }
+
+    };
+
+
+/* =========================
+   LOAD EXPERIENCE LEVELS
+========================= */
+
+const loadExperienceLevels =
+    async () => {
+
+        try {
+
+            loadingExperienceLevels.value =
+                true;
+
+            const response =
+                await GetAllExperienceLevel();
+
+            experienceLevels.value =
+                response.data ?? [];
+
+        }
+        catch (err) {
+
+            console.error(
+                "Error loading experience levels:",
+                err
+            );
+
+            error.value =
+                "Failed to load experience levels";
+
+        }
+        finally {
+
+            loadingExperienceLevels.value =
+                false;
+
+        }
+
+    };
+
+
+/* =========================
+   LOAD JOB FOR EDIT
+========================= */
+
+const loadJobForEdit =
+    async () => {
+
+        if (editId.value === null) {
+
+            return;
+
+        }
+
+
+        try {
+
+            loadingJob.value = true;
+            isEditing.value =true;
+            error.value = "";
+
+
+            const response =
+                await GetJobById(
+                    editId.value
+                );
+
+            const job =
+                response.data;
+
+
+            /* =========================
+               BASIC DETAILS
+            ========================= */
+
+            form.title =
+                job.title ?? "";
+
+
+            form.description =
+                job.description ?? "";
+
+
+            form.location =
+                job.location ?? "";
+
+
+            /* =========================
+               FIND EMPLOYMENT TYPE ID
+            ========================= */
+
+            const employmentType =
+                employmentTypes.value.find(
+                    type =>
+                        type.description ===
+                        job.employmentType
+                );
+
+
+            form.refEmploymentType =
+                employmentType?.id;
+
+
+            /* =========================
+               FIND EXPERIENCE LEVEL ID
+            ========================= */
+
+            const experienceLevel =
+                experienceLevels.value.find(
+                    level =>
+                        level.description ===
+                        job.experienceLevel
+                );
+
+
+            form.refExperienceLevel =
+                experienceLevel?.id;
+
+
+            /* =========================
+               SALARY
+            ========================= */
+
+            form.minSalary =
+                job.minSalary;
+
+
+            form.maxSalary =
+                job.maxSalary;
+
+
+            /* =========================
+               DEADLINE
+            ========================= */
+
+            form.deadline =
+                job.deadline
+                    ? job.deadline.substring(0, 10)
+                    : undefined;
+
+
+            /* =========================
+               SET TIPTAP CONTENT
+            ========================= */
+
+            editor.value?.commands.setContent(
+                job.description ?? ""
+            );
+
+        }
+        catch (err: any) {
+
+            console.error(
+                "Error loading job:",
+                err
+            );
+
+            error.value =
+                err.response?.data?.message ||
+                "Failed to load job";
+
+        }
+        finally {
+
+            loadingJob.value = false;
+
+        }
+
+    };
+
+
+/* =========================
+   RESET FORM
+========================= */
+
+const resetForm = () => {
+
+    form.title = "";
+
+    form.description = "";
+
+    form.location = "";
+
+    form.refEmploymentType =
+        undefined;
+
+    form.refExperienceLevel =
+        undefined;
+
+    form.minSalary =
+        undefined;
+
+    form.maxSalary =
+        undefined;
+
+    form.deadline =
+        undefined;
+
+
+    editor.value?.commands.clearContent();
 
 };
 
-
-/*
-|--------------------------------------------------------------------------
-| Load Experience Levels
-|--------------------------------------------------------------------------
-*/
-
-const loadExperienceLevels = async () => {
-
-    try {
-
-        loadingExperienceLevels.value =
-            true;
-
-        const response =
-            await GetAllExperienceLevel();
-
-        experienceLevels.value =
-            response.data ?? [];
-
-    } catch (err) {
-
-        console.error(
-            "Error loading experience levels:",
-            err
-        );
-
-        error.value =
-            "Failed to load experience levels";
-
-    } finally {
-
-        loadingExperienceLevels.value =
-            false;
-
+/*  Cancel Action
+ */
+const CancelAction = ()=>{
+    isEditing.value = false;
+    if(isEditMode.value){
+        router.push("/recruiter/jobs");
     }
-
-};
-
-
-/*
-|--------------------------------------------------------------------------
-| Submit
-|--------------------------------------------------------------------------
-*/
+    else{
+    router.push("/recruiterDashboard");
+    }
+}
+/* =========================
+   SUBMIT
+========================= */
 
 const submitJob = async () => {
 
     try {
-
+        
         loading.value = true;
 
         error.value = "";
 
-
+ if(isEditing){
         const payload: JobRequest = {
 
             title:
@@ -267,50 +574,84 @@ const submitJob = async () => {
         };
 
 
-        const response =
-            await CreateJob(payload);
+        let response;
 
 
-        if(response.status == HTTP_StatusCodes.OK){
-            ischangesSaved.value = true;
+        /* =========================
+           EDIT
+        ========================= */
+
+        if (isEditMode.value) {
+
+            response =
+                await UpdateJob(
+                    editId.value!,
+                    payload
+                );
+
         }
-       
-        // Reset form
 
-        form.title = "";
+        /* =========================
+           CREATE
+        ========================= */
 
-        form.description = "";
+        else {
 
-        form.location = "";
+            response =
+                await CreateJob(
+                    payload
+                );
 
-        form.refEmploymentType =
-            undefined;
+        }
 
-        form.refExperienceLevel =
-            undefined;
 
-        form.minSalary =
-            undefined;
+        /* =========================
+           SUCCESS
+        ========================= */
 
-        form.maxSalary =
-            undefined;
+        if (
+            response.status ===
+            HTTP_StatusCodes.OK
+        ) {
 
-        form.deadline =
-            undefined;
+            ischangesSaved.value =
+                true;
 
-        editor.value?.commands.clearContent();
-    } catch (err: any) {
+        }
+
+
+        /* =========================
+           RESET ONLY FOR CREATE
+        ========================= */
+
+        if (!isEditMode.value) {
+
+            resetForm();
+            isEditing.value = false;
+
+        }
+    }
+
+    }
+    catch (err: any) {
 
         console.error(
-            "Error creating job:",
+            `Error ${isEditMode.value
+                ? "updating"
+                : "creating"
+            } job:`,
             err
         );
 
         error.value =
             err.response?.data?.message ||
-            "Failed to create job";
+            `Failed to ${isEditMode.value
+                ? "update"
+                : "create"
+            } job`;
 
-    } finally {
+    }
+    finally {
 
         loading.value = false;
 
@@ -319,23 +660,56 @@ const submitJob = async () => {
 };
 
 
-/*
-|--------------------------------------------------------------------------
-| Load dropdowns
-|--------------------------------------------------------------------------
-*/
+/* =========================
+   LOAD DATA
+========================= */
 
-onMounted(() => {
+onMounted(async () => {
 
-    loadEmploymentTypes();
+    /*
+     * First load dropdowns.
+     * We need them before loading the
+     * job because we use them to find
+     * employment/experience IDs.
+     */
 
-    loadExperienceLevels();
+    await Promise.all([
+
+        loadEmploymentTypes(),
+
+        loadExperienceLevels()
+
+    ]);
+
+
+    /*
+     * If editId exists,
+     * load existing job.
+     */
+
+    if (isEditMode.value) {
+
+        await loadJobForEdit();
+
+    }
 
 });
+
+
+/* =========================
+   REDIRECT AFTER SUCCESS
+========================= */
+
 const redirect = () => {
+
     ischangesSaved.value = false;
-    router.push("/recruiterDashboard");
-}
+
+    router.push(
+        "/recruiter/jobs"
+    );
+
+};
+
 </script>
 
 
@@ -360,12 +734,15 @@ const redirect = () => {
                     <div>
 
                         <h1>
-                            Create Job
+                            {{ isEditMode ? "Edit Job" : "Create Job" }}
                         </h1>
 
                         <p>
-                            Create a new job posting
-                            for your company.
+                            {{
+                                isEditMode
+                                    ? "Update your job posting details."
+                                    : "Create a new job posting for your company."
+                            }}
                         </p>
 
                     </div>
@@ -456,6 +833,9 @@ const redirect = () => {
 
                                 <!-- Tiptap editor -->
                                 <EditorContent :editor="editor" class="description-editor" />
+                                <div class="description-counter">
+                                    {{ editor?.storage.characterCount.characters() ?? 0 }} / {{MAX_DESCRIPTION_LENGTH}}
+                                </div>
 
                             </div>
                         </div>
@@ -601,19 +981,29 @@ level in experienceLevels
                         <!-- Actions -->
 
                         <div class="form-actions">
+                            <button type="button" class="cancel"@click="CancelAction">Cancel</button>
 
-                            <button type="submit" class="submit-btn" :disabled="loading ||
+                            <button type="submit" class="submit-btn" :disabled="loading || loadingJob ||
                                 loadingEmploymentTypes ||
                                 loadingExperienceLevels
                                 ">
 
                                 {{
                                     loading
-                                        ? "Creating..."
-                                        : "Create Job"
+                                        ? (
+                                            isEditMode
+                                                ? "Updating..."
+                                                : "Creating..."
+                                        )
+                                        : (
+                                            isEditMode
+                                                ? "Update Job"
+                                                : "Create Job"
+                                        )
                                 }}
 
                             </button>
+                            
 
                         </div>
 
@@ -630,9 +1020,13 @@ level in experienceLevels
                     ✓
                 </div>
 
-                <h2>Changes Saved!</h2>
+                <h2>{{ isEditMode ? "Job Updated!" : "Job Created!" }}</h2>
 
-                <p>Your company details have been updated successfully.</p>
+                <p> {{
+                    isEditMode
+                        ? "Your job has been updated successfully."
+                        : "Your job has been created successfully."
+                }}</p>
 
                 <button class="modal-btn" @click="redirect">
                     OK
@@ -823,32 +1217,27 @@ level in experienceLevels
     justify-content: flex-end;
 
     margin-top: 10px;
+    align-items: center;
 
 }
 
+.form-actions button {
+    box-sizing: border-box;
+    height: 44px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
 .submit-btn {
-
     border: none;
-
-    border-radius: 8px;
-
-    padding: 12px 24px;
-
     background: #4f46e5;
-
     color: white;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
     transition:
         background 0.2s,
         transform 0.1s;
-
 }
 
 
@@ -1003,6 +1392,7 @@ level in experienceLevels
     font-weight: 700;
     margin: 12px 0 8px;
 }
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1077,6 +1467,17 @@ level in experienceLevels
     background: #334f9c;
 }
 
+.description-counter {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 13px;
+    color: #6b7280;
+}
+.cancel{
+    margin:0 10px 0 0;
+    color:grey;
+ 
+}
 @keyframes modalFadeIn {
     from {
         opacity: 0;

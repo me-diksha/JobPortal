@@ -120,21 +120,21 @@ const redirect = ()=>{
     </div>
     <form @submit.prevent="saveCompany">
         <div class="info-grid">
-            <input v-model="editData.name" placeholder="Company Name" required>
-            <input v-model="editData.description" placeholder="Company Description">
-            <input v-model="editData.industry" placeholder="Company Industry">
-            <input v-model="editData.website" placeholder="Company website" required>
-            <input v-model="editData.email" placeholder="email" required>
-            <input v-model="editData.phone" placeholder="Company phone">
-            <input v-model="editData.addressLine1" placeholder="Company address" required>
-            <input v-model="editData.addressLine2" placeholder="Company addressline2">
-            <input v-model="editData.city" placeholder="Company City" required>
-            <input v-model="editData.state" placeholder="Company State" required>
-            <input v-model="editData.country" placeholder="Company Country" required>
-            <input v-model="editData.postalCode" placeholder="Company postalcode" required>
-            <input v-model="editData.logosUrl" placeholder="Company logo">
-            <input v-model="editData.companySize" placeholder="Company size">
-            <input v-model="editData.foundedYear" placeholder="founded year">
+            <input class="details" v-model="editData.name" placeholder="Company Name" required>
+            <input class="details" v-model="editData.description" placeholder="Company Description">
+            <input class="details" v-model="editData.industry" placeholder="Company Industry">
+            <input class="details" v-model="editData.website" placeholder="Company website" required>
+            <input class="details" v-model="editData.email" placeholder="email" required>
+            <input class="details" v-model="editData.phone" placeholder="Company phone">
+            <input class="details" v-model="editData.addressLine1" placeholder="Company address" required>
+            <input class="details" v-model="editData.addressLine2" placeholder="Company addressline2">
+            <input class="details" v-model="editData.city" placeholder="Company City" required>
+            <input class="details" v-model="editData.state" placeholder="Company State" required>
+            <input class="details" v-model="editData.country" placeholder="Company Country" required>
+            <input class="details" v-model="editData.postalCode" placeholder="Company postalcode" required>
+            <input class="details" v-model="editData.logosUrl" placeholder="Company logo">
+            <input class="details" v-model="editData.companySize" placeholder="Company size">
+            <input class="details" v-model="editData.foundedYear" placeholder="founded year">
         </div>
         <button type="submit" class="edit-btn">Save</button>
     </form>
@@ -201,6 +201,11 @@ h2 {
     gap: 20px;
     margin:20px;
 
+}
+.details{
+    padding: 10px;
+    background-color:rgb(227, 227, 245);
+    border:none;
 }
 .For-back-btn{
     margin: 20px;

@@ -1,6 +1,6 @@
--- DROP FUNCTION public.get_recruiter_jobs(int8);
+-- DROP FUNCTION public.get_jobs_byid(int8);
 
-CREATE OR REPLACE FUNCTION public.get_recruiter_jobs(p_companyid bigint)
+CREATE OR REPLACE FUNCTION public.get_jobs_byid(p_jobid bigint)
  RETURNS TABLE(id bigint, title character varying, description text, location character varying, employmenttype character varying, experiencelevel character varying, minsalary numeric, maxsalary numeric, status character varying, deadline date, companyname character varying)
  LANGUAGE plpgsql
 AS $function$
@@ -27,7 +27,7 @@ BEGIN
         ON e.id = j.refemploymenttype
     LEFT JOIN jobstatus js
         ON js.id = j.refstatus
-    WHERE j.companyid = p_companyid and j.isdeleted = 0;
+    WHERE j.id= p_jobid;
 END;
 $function$
 ;
