@@ -56,6 +56,7 @@ declare
 	v_DeductionInvoiceId    	bigint;
 	v_DeductionInvoiceTotalExGst numeric;
 	v_DeductionInvoiceTotalGst   numeric;
+    v_count            bigint;
 
 
 begin
@@ -73,6 +74,7 @@ begin
 	v_periodicchargetype 	:= 2;
 	v_invoicechargevalue	:= 0; 
 	v_invoicepersisted		:= 0; 
+    
 
 	if(v_dateto > now()) then v_dateto := now(); end if; 
 
@@ -87,11 +89,15 @@ begin
 		select fo.*, ifr.description invoicefrequency
 		from fleetowner fo 
 		inner join invoicefrequency ifr on fo.refinvoicefrequency = ifr.id
-		where (p_fleetownerid is null or fo.id = p_fleetownerid) and fo.invoicestartdate <= v_dateto order by fo.id
+		where (p_fleetownerid is null or fo.id = p_fleetownerid) and fo.invoicestartdate <= v_dateto 
 	loop --fleetownerrecord--
+		perform 1
+		from fleetowner
+		where fleetowner.id=fleetownerrecord.id
+		for update;
 		arr_invoicetodates:=array[]::date[];
 		max_invoicetodate:= null;
-		
+		Raise notice 'Fleetowner processing=% PID=%',fleetownerrecord.id,pg_backend_pid();
 		if fleetownerrecord.invoicestartdate is null then continue; end if;-- no docket to be invoiced
 
 		select coalesce(min(d.duedate), v_initialinvoicedate)::date into v_oldestdocketdate 
@@ -99,11 +105,11 @@ begin
 		inner join run r on r.id = d.refrun 
 		inner join driver dr on dr.id = r.refdriver and dr.reffleetowner = fleetownerrecord.id 
 		where (d.refdocketstatus = v_docketstatusrctiissued) and (d.duedate between v_initialinvoicedate and v_dateto);
-	
+	    Raise notice 'run proceed';
 		select coalesce( max(inv.dateto), v_initialinvoicedate) into v_lastinvoicedate
 		from rcti_invoice inv 
 		where inv.reffleetowner = fleetownerrecord.id  and inv.refdebitdocumenttype = v_debitdocumentRCTI; -- 1
-		
+		Raise notice 'last invoice date =%',v_lastinvoicedate;
 		for newInvoiceRecord in (
 			select startdate , invoicedate 
 			from invoicerangebreakup_s(fleetownerrecord.invoicestartdate, v_dateto, v_initialinvoicedate, fleetownerrecord.refinvoicefrequency::smallint) 
@@ -115,7 +121,7 @@ begin
 		loop --newInvoiceRecord-- 
 			v_invoicepersisted:=0;
 			v_completedtotaldocketitems:=0;
-			
+			raise notice 'run proceed for fleetowner=%',fleetownerrecord.id;
 		
 			if((select count(unnest) from unnest(arr_invoicetodates) where unnest =newInvoiceRecord.invoicedate)<=0) then
 				arr_invoicetodates:= array_append(arr_invoicetodates,newInvoiceRecord.invoicedate);
@@ -164,12 +170,14 @@ begin
 			  );
 					 
 			if (coalesce(v_docketcount, 0) = 0  or coalesce(v_totaldocumentpayment,0.0) = 0) then
+                raise notice 'skipped';
 				continue;
 			end if; -- do not invoice							
 	
 			if (p_generateinvoice = 1) then 
 				invoiceid := nextval('RCTI_INVOICE_ID_SEQ');
 			    invoiceno := nextval('INVOICE_NUMBER_SEQ')::varchar;
+				insert into rcti_debug (createtime, sessionid ,fleetowner,msg )values (clock_timestamp(),pg_backend_pid(),fleetownerrecord.id,'before exists');
    				if exists(
 					select 1
 					from rcti_invoice ri
@@ -177,10 +185,12 @@ begin
 					and ri.datefrom=newInvoiceRecord.startdate
 					and ri.dateto= newInvoiceRecord.invoicedate
 					and ri.refdebitdocumenttype=v_debitdocumentRCTI
-	 				)then
+	 				) then
+						insert into rcti_debug (createtime, sessionid ,fleetowner,msg )values (clock_timestamp(),pg_backend_pid(),fleetownerrecord.id,'rcti_invoice already exist');	
 						continue;
  				end if;
-
+				insert into rcti_debug (createtime, sessionid ,fleetowner,msg )values (clock_timestamp(),pg_backend_pid(),fleetownerrecord.id,'after exists');	
+				insert into rcti_debug (createtime, sessionid ,fleetowner,msg )values (clock_timestamp(),pg_backend_pid(),fleetownerrecord.id,'before insert');
 				insert into rcti_invoice(
 					  id
 				  	, invoiceno			    
@@ -219,6 +229,7 @@ begin
 					, v_debitdocumentRCTI
 					, 1
 				);		   
+				
 				v_invoicepersisted := 1;	
 				v_DeductionInvoiceId := 0;
 			end if;
@@ -226,6 +237,18 @@ begin
 			v_rcti_invoiceitemexists := 0;
 		    v_Rcti_InvoiceChargeExists := 0;
 			--if v_docketcount >= 1 then
+			v_count :=0;
+            select count(*) into v_count
+			from rcti_invoice ri
+			where ri.reffleetowner = fleetownerrecord.id
+				and ri.datefrom=newInvoiceRecord.startdate
+				and ri.dateto= newInvoiceRecord.invoicedate
+				and ri.refdebitdocumenttype=v_debitdocumentRCTI;
+			if(v_count>=2) then
+				delete from rcti_invoice  where id = invoiceid;
+				raise notice 'count become 2 so deleted one last record for session id=%',pg_backend_pid();
+				continue;
+			end if;
 			for docketrecord in 
 				select 
 						d.id
@@ -515,7 +538,7 @@ begin
 								, case when (fleetownerrecord.gstfree = 0) then v_PeriodicChargeValue * v_gstvalue::numeric/ 100.00::numeric else 0::numeric end ::money -- totalgst
 								, newInvoiceRecord.invoicedate						
 							);			
-							v_Rcti_InvoiceChargeExists = 1;
+							v_Rcti_InvoiceChargeExists := 1;
 							totalexgst := totalexgst::numeric + v_PeriodicChargeValue::numeric;
 						end if;
 					end if;
@@ -644,8 +667,9 @@ begin
 					, totalitems = 0
 				where id = v_DeductionInvoiceId; 
 			end if;
-		
+			
 			if (v_rcti_invoiceitemexists = 0 and v_invoicepersisted = 1 and v_Rcti_InvoiceChargeExists = 0) then 
+					
 					delete from rcti_invoice  where id = invoiceid;
 					continue;
 			end if; 
