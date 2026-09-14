@@ -5,6 +5,7 @@ import Sidebar from "@/components/common/SideBar.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "vue-router";
 import { loadRecruiterContext } from "@/composables/Recruiter/useRecruiterContext";
+import { recruiterMenu ,bottomMenu} from "@/constants/recruiterMenu";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -22,20 +23,6 @@ const handleLogout = () => {
 const gotoProfile =()=>{
     router.push('/recruiterProfile');
 }
-const recruiterMenu = [
-  { name: "Dashboard", icon: "🏠", path: "/recruiterDashboard" },
-  { name: "Company Profile", icon: "🏢", path: "/company" },
-  { name: "Post Job", icon: "📢", path: "/recruiter/jobs/create" },
-  { name: "Manage Jobs", icon: "💼", path: "/recruiter/jobs" },
-  { name: "Candidates", icon: "👥", path: "/candidates" },
-  { name: "Interviews", icon:"📅", path: "/interview"},
-  {name: "Shortlisted", icon:"⭐", path: "shortlisted"}
-];
-const bottomMenu = [
-  { name: "Preferences", icon: "⚙" },
-  { name: "Dark Mode", icon: "🌙" },
-  { name: "Help Center", icon: "💬" }
-];
 
 
 onMounted(async () => {

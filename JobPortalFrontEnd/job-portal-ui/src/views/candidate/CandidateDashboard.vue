@@ -6,6 +6,7 @@ import logo from "@/assets/JobPortal_logo.png";
 import  {GetCandidateProfileDetails}  from "@/composables/CandidateProfile/UseGetCandidateProfile";
 import type { CandidateProfile as CandidateProfileType } from "@/types/candidate";
 import { useAuthStore } from "@/stores/authStore";
+import { candidateMenu, candidateBottomMenu } from "@/constants/candidateMenu";
 const router = useRouter();
 const candidateProfile = ref<CandidateProfileType | null>(null);
 const loading = ref(false);
@@ -28,8 +29,8 @@ const getCandidateProfile = async () => {
         loading.value = false;
     }
 };
-onMounted(() => {
-    getCandidateProfile();
+onMounted(async () => {
+    await getCandidateProfile();
 });
 const goToProfile = () => {
 
@@ -48,39 +49,8 @@ const handlelogout = () => {
 
     router.push("/login");
 }
-const candidateMenu = [
-
-{
- name:"Home",
- icon:"🏠",
- path:"/candidateDashboard"
-},
 
 
-{
- name:"Browse Jobs",
- icon:"💼",
- path:"/jobs"
-},
-
-{
- name:"Applications",
- icon:"📄",
- path:"/applications"
-},
-
-{
- name:"Saved Jobs",
- icon:"⭐",
- path:"/savedJobs"
-}
-
-];
-const bottomMenu = [
-  { name: "Preferences", icon: "⚙" },
-  { name: "Dark Mode", icon: "🌙" },
-  { name: "Help Center", icon: "💬" }
-];
 </script>
 
 
@@ -91,7 +61,7 @@ const bottomMenu = [
        slogan="Find Your Sea"
        :logo="logo"
        :menuItems="candidateMenu"
-      :bottomMenu="bottomMenu"/>
+      :bottomMenu="candidateBottomMenu"/>
 
         <!-- Main Area -->
 

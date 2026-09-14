@@ -16,6 +16,7 @@ import { GetCandidateProfileDetails } from "@/composables/CandidateProfile/UseGe
 import { GetCandidateSkills } from "@/composables/CandidateSkills/UseGetCandidateSkill";
 import { GetCandidateEducation } from "@/composables/CandidateEducation/UseGetCandidateEducation";
 import { GetCandidateExperience } from "@/composables/CandidateExperience/UseGetCandidateExperience";
+import { candidateMenu, candidateBottomMenu } from "@/constants/candidateMenu";
 
 const isEdit = ref(false);
 const loading = ref(false);
@@ -24,39 +25,7 @@ const candidateProfile = ref<CandidateProfileType | null>(null);
 const candidateSkills = ref<CandidateSkill[]>([]);
 const candidateEducation = ref<CandidateEducationType[]>([]);
 const candidateExperienence = ref<CandidateExperienceType[]>([]);
-const candidateMenu = [
 
-    {
-        name: "Home",
-        icon: "🏠",
-        path: "/candidateDashboard"
-    },
-
-
-    {
-        name: "Browse Jobs",
-        icon: "💼",
-        path: "/jobs"
-    },
-
-    {
-        name: "Applications",
-        icon: "📄",
-        path: "/applications"
-    },
-
-    {
-        name: "Saved Jobs",
-        icon: "⭐",
-        path: "/savedJobs"
-    }
-
-];
-const bottomMenu = [
-    { name: "Preferences", icon: "⚙" },
-    { name: "Dark Mode", icon: "🌙" },
-    { name: "Help Center", icon: "💬" }
-];
 
 const loadprofiledetails = async () => {
     try {
@@ -83,8 +52,8 @@ const loadprofiledetails = async () => {
         loading.value = false;
     }
 }
-onMounted(() => {
-    loadprofiledetails();
+onMounted(async () => {
+    await loadprofiledetails();
 })
 const handleEducationEdit = (updatedEducation: CandidateEducationType) => {
     const index = candidateEducation.value.findIndex(
@@ -163,7 +132,7 @@ const saveProfile = () => {
 
     <div class="dashboard">
         <Sidebar companyName="Jobsy" slogan="Find Your Sea" :logo="logo" :menuItems="candidateMenu"
-            :bottomMenu="bottomMenu" />
+            :bottomMenu="candidateBottomMenu" />
         <section class="main">
 
 

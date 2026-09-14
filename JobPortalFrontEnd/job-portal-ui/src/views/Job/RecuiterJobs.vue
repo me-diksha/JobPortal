@@ -31,6 +31,7 @@ import type {
 } from "@/types/Job";
 import { DeleteJob } from "@/composables/Job/UseDeleteJob";
 import { HttpStatusCode } from "axios";
+import { recruiterMenu,bottomMenu } from "@/constants/recruiterMenu";
 
 
 /* =========================
@@ -70,76 +71,6 @@ const ischangeDelete = ref(false);
 const selectedJob = ref<Job | null>(null);
 
 
-
-/* =========================
-   SIDEBAR
-========================= */
-
-const recruiterMenu = [
-
-    {
-        name: "Dashboard",
-        icon: "🏠",
-        path: "/recruiterDashboard"
-    },
-
-    {
-        name: "Company Profile",
-        icon: "🏢",
-        path: "/company"
-    },
-
-    {
-        name: "Post Job",
-        icon: "📢",
-        path: "/recruiter/jobs/create"
-    },
-
-    {
-        name: "Manage Jobs",
-        icon: "💼",
-        path: "/recruiter/jobs"
-    },
-
-    {
-        name: "Candidates",
-        icon: "👥",
-        path: "/candidates"
-    },
-
-    {
-        name: "Interviews",
-        icon: "📅",
-        path: "/interview"
-    },
-
-    {
-        name: "Shortlisted",
-        icon: "⭐",
-        path: "shortlisted"
-    }
-
-];
-
-
-const bottomMenu = [
-
-    {
-        name: "Preferences",
-        icon: "⚙"
-    },
-
-    {
-        name: "Dark Mode",
-        icon: "🌙"
-    },
-
-    {
-        name: "Help Center",
-        icon: "💬"
-    }
-
-];
 
 
 /* =========================
@@ -424,11 +355,11 @@ const createJob = () => {
    MOUNT
 ========================= */
 
-onMounted(() => {
+onMounted(async () => {
 
-    loadJobs();
+    await loadJobs();
 
-    loadJobStatuses();
+    await loadJobStatuses();
 
 });
 

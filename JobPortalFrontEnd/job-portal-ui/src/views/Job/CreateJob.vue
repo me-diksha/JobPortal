@@ -61,6 +61,7 @@ import {
 import {
     HTTP_StatusCodes
 } from "@/components/common/enum/HTTP_StatusCodes";
+import { recruiterMenu,bottomMenu } from "@/constants/recruiterMenu";
 
 
 /* =========================
@@ -140,76 +141,6 @@ const experienceLevels =
 const ischangesSaved =
     ref(false);
 
-
-/* =========================
-   SIDEBAR
-========================= */
-
-const recruiterMenu = [
-
-    {
-        name: "Dashboard",
-        icon: "🏠",
-        path: "/recruiterDashboard"
-    },
-
-    {
-        name: "Company Profile",
-        icon: "🏢",
-        path: "/company"
-    },
-
-    {
-        name: "Post Job",
-        icon: "📢",
-        path: "/recruiter/jobs/create"
-    },
-
-    {
-        name: "Manage Jobs",
-        icon: "💼",
-        path: "/recruiter/jobs"
-    },
-
-    {
-        name: "Candidates",
-        icon: "👥",
-        path: "/candidates"
-    },
-
-    {
-        name: "Interviews",
-        icon: "📅",
-        path: "/interview"
-    },
-
-    {
-        name: "Shortlisted",
-        icon: "⭐",
-        path: "shortlisted"
-    }
-
-];
-
-
-const bottomMenu = [
-
-    {
-        name: "Preferences",
-        icon: "⚙"
-    },
-
-    {
-        name: "Dark Mode",
-        icon: "🌙"
-    },
-
-    {
-        name: "Help Center",
-        icon: "💬"
-    }
-
-];
 
 
 /* =========================
@@ -1393,6 +1324,7 @@ level in experienceLevels
     margin: 12px 0 8px;
 }
 
+/*modal*/
 .modal-overlay {
     position: fixed;
     top: 0;

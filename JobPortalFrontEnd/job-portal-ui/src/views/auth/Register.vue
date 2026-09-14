@@ -60,8 +60,8 @@ const getCompanies = async () => {
     }
 };
 
-onMounted(() => {
-    getCompanies();
+onMounted(async () => {
+    await getCompanies();
 })
 
 const filteredCompanies = computed(() => {

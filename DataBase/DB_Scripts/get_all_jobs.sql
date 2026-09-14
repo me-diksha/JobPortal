@@ -1,20 +1,9 @@
-CREATE OR REPLACE FUNCTION get_all_jobs()
-RETURNS TABLE
-(
-    id BIGINT,
-    title VARCHAR,
-    description character varying,
-    location VARCHAR,
-    refemploymenttype bigint,
-    employmenttype VARCHAR,
-    experiencelevel VARCHAR,
-    minsalary NUMERIC,
-    maxsalary NUMERIC,
-    deadline DATE,
-    status VARCHAR,
-    companyname VARCHAR
-)
-AS $$
+-- DROP FUNCTION public.get_all_jobs();
+
+CREATE OR REPLACE FUNCTION public.get_all_jobs()
+ RETURNS TABLE(id bigint, title character varying, description text, location character varying,employmenttype character varying, experiencelevel character varying, minsalary numeric, maxsalary numeric, deadline date, status character varying, companyname character varying)
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
 
     RETURN QUERY
@@ -23,19 +12,21 @@ BEGIN
         j.title,
         j.description,
         j.location,
-        j.refemploymenttype,
 		et.description,
-        j.experiencelevel,
+        et.description,
         j.minsalary,
         j.maxsalary,
         j.deadline,
-        j.status,
+        js.description,
         c.name AS companyname
     FROM jobs j
-	INNER JOIN employment_type ON et.id= j.refemploymenttype 
+	INNER JOIN employment_type et ON et.id= j.refemploymenttype 
+    INNER JOIN experiencelevel e ON e.id= j.refexperiencelevel
+	INNER JOIN jobstatus js ON js.id = j.refstatus
     INNER JOIN company c
         ON c.id = j.companyid
     WHERE j.isdeleted = 0;
 
 END;
-$$ LANGUAGE plpgsql;
+$function$
+;

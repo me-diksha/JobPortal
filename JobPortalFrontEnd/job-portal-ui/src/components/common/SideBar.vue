@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import type{ MenuItem, BottomMenuItem } from "@/constants/MenuItem";
 
-interface MenuItem {
-  name: string;
-  icon: string;
-  path: string;
-}
-
-interface BottomMenuItem {
-  name: string;
-  icon: string;
-  action?: string;
-}
 
 const props = defineProps<{
   companyName: string;

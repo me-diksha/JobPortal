@@ -29,8 +29,8 @@ const loadCompany = async () => {
         isloading.value = false;
     }
 }
-onMounted(() => {
-    loadCompany();
+onMounted(async() => {
+    await loadCompany();
 });
 const router = useRouter();
 const editData = ref<CompanyDetails>({
